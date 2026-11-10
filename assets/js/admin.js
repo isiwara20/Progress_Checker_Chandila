@@ -52,6 +52,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 5. Milestone Checklist AJAX Toggle
     initMilestoneChecklist();
+
+    // 6. Universal Logout Confirmation Modal Interceptor
+    initLogoutConfirmation();
 });
 
 /**
@@ -359,4 +362,36 @@ function initMilestoneChecklist() {
         });
     });
 }
+
+/**
+ * Universal Logout Confirmation Modal Handler
+ */
+function initLogoutConfirmation() {
+    document.addEventListener('click', function (e) {
+        const logoutTrigger = e.target.closest('a[href*="logout.php"], .admin-logout-trigger, [data-confirm-logout]');
+        if (!logoutTrigger) return;
+
+        // Skip if this is the confirmation button inside the modal itself
+        if (logoutTrigger.id === 'confirmLogoutBtn') return;
+
+        e.preventDefault();
+        const targetUrl = logoutTrigger.getAttribute('href') || ((window.BASE_URL || '') + '/logout.php');
+
+        const modalEl = document.getElementById('chandilaLogoutModal');
+        if (modalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const confirmBtn = document.getElementById('confirmLogoutBtn');
+            if (confirmBtn) {
+                confirmBtn.setAttribute('href', targetUrl);
+            }
+            const modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            modalInstance.show();
+        } else {
+            // Graceful native browser dialog fallback
+            if (window.confirm('Are you sure you want to log out of your session?')) {
+                window.location.href = targetUrl;
+            }
+        }
+    });
+}
+
 

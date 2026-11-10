@@ -112,27 +112,9 @@ require_once __DIR__ . '/includes/header.php';
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-chandila-primary w-100 py-3 fw-bold mb-4 shadow-sm">
+                        <button type="submit" class="btn btn-chandila-primary w-100 py-3 fw-bold mb-0 shadow-sm">
                             <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Sign In to Portal
                         </button>
-
-                        <!-- Quick Demo Credentials Selector -->
-                        <div class="p-3 rounded-3" style="background: #f8fafc; border: 1.5px dashed #cbd5e1;">
-                            <div class="text-muted small fw-semibold mb-2 text-center">
-                                <i class="fa-solid fa-wand-magic-sparkles text-warning me-1"></i> Quick Demo Accounts (Click to Auto-Fill):
-                            </div>
-                            <div class="d-flex flex-wrap gap-2 justify-content-center">
-                                <button type="button" class="btn btn-sm btn-outline-primary demo-fill-btn fw-semibold" data-user="admin" data-pass="Admin@12345">
-                                    <i class="fa-solid fa-user-shield me-1"></i> Admin
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary demo-fill-btn fw-semibold" data-user="dev1" data-pass="Dev1@12345">
-                                    <i class="fa-solid fa-laptop-code me-1"></i> Dev 01
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary demo-fill-btn fw-semibold" data-user="dev2" data-pass="Dev2@12345">
-                                    <i class="fa-solid fa-laptop-code me-1"></i> Dev 02
-                                </button>
-                            </div>
-                        </div>
                     </form>
                 </div>
             </div>
@@ -157,16 +139,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-
-    // Demo fill buttons
-    document.querySelectorAll('.demo-fill-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
-            const user = this.getAttribute('data-user');
-            const pass = this.getAttribute('data-pass');
-            document.getElementById('username_or_email').value = user;
-            document.getElementById('password').value = pass;
-        });
-    });
 });
 </script>
 

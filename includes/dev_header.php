@@ -89,7 +89,7 @@ $devPage = basename($_SERVER['PHP_SELF']);
                         </li>
                         <li><a class="dropdown-item py-2" href="<?php echo BASE_URL; ?>/developer/profile.php"><i class="fa-solid fa-user-gear me-2 text-primary"></i> My Profile</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item py-2 text-danger" href="<?php echo BASE_URL; ?>/logout.php"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Log Out</a></li>
+                        <li><a class="dropdown-item py-2 text-danger admin-logout-trigger" href="<?php echo BASE_URL; ?>/logout.php" data-confirm-logout="true"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Log Out</a></li>
                     </ul>
                 </div>
             </div>

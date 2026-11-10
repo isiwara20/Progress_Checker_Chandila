@@ -137,7 +137,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
         <!-- 12. Logout -->
         <li class="admin-menu-item mt-3 pt-2 border-top border-secondary border-opacity-25">
-            <a href="<?php echo BASE_URL; ?>/logout.php" class="admin-menu-link text-danger">
+            <a href="<?php echo BASE_URL; ?>/logout.php" class="admin-menu-link text-danger admin-logout-trigger" data-confirm-logout="true" title="Log out of session">
                 <i class="fa-solid fa-arrow-right-from-bracket text-danger"></i>
                 <span>Logout</span>
             </a>

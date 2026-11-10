@@ -110,6 +110,10 @@
     <!-- Toast Notification Container -->
     <?php echo renderFlashAlerts(); ?>
 
+    <?php if (function_exists('isLoggedIn') && isLoggedIn()): ?>
+        <?php require_once __DIR__ . '/logout_modal.php'; ?>
+    <?php endif; ?>
+
     <!-- Bootstrap 5.3.3 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Toast Notification Scripts -->

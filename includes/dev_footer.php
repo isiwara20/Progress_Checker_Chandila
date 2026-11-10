@@ -16,6 +16,9 @@
     </div>
 </div>
 
+<!-- Logout Confirmation Modal Component -->
+<?php require_once __DIR__ . '/logout_modal.php'; ?>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     window.BASE_URL = '<?php echo BASE_URL; ?>';
