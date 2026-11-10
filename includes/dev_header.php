@@ -35,6 +35,8 @@ $devPage = basename($_SERVER['PHP_SELF']);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Admin & Dev Custom CSS -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/admin.css?v=<?php echo filemtime(__DIR__ . '/../assets/css/admin.css'); ?>">
+    <!-- Toast Notification System (Early Load) -->
+    <script src="<?php echo BASE_URL; ?>/assets/js/toast.js"></script>
 </head>
 <body class="admin-body">
 

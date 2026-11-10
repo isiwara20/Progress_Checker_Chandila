@@ -1,13 +1,17 @@
 <?php
-$pageTitle = 'Staff Login – Chandila Web Development';
-require_once __DIR__ . '/includes/header.php';
+/**
+ * Chandila Web Development – Staff Login Portal
+ */
+require_once __DIR__ . '/config/config.php';
+require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/includes/functions.php';
 
 $pdo = getDB();
 $errorMessage = '';
 $redirect = $_GET['redirect'] ?? '';
 
-// If already logged in, redirect to respective portal
+// If already logged in, redirect to respective portal immediately
 if (isLoggedIn()) {
     $role = getUserRole();
     if ($role === 'admin') {
@@ -19,6 +23,7 @@ if (isLoggedIn()) {
     }
 }
 
+// Handle Staff Authentication POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'staff_login') {
     if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
         $errorMessage = "Security session expired. Please refresh the page.";
@@ -51,6 +56,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
     }
 }
+
+// Disable preloader on login page to ensure instant, crisp render without any blocking overlay
+$disablePreloader = true;
+$pageTitle = 'Staff Login – Chandila Web Development';
+require_once __DIR__ . '/includes/header.php';
 ?>
 
 <div class="py-5" style="background: linear-gradient(180deg, #f1f5f9 0%, #f8fafc 100%); min-height: 80vh; display: flex; align-items: center;">

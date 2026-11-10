@@ -1,13 +1,18 @@
 <?php
-$pageTitle = 'Customer Project Portal – Chandila Web Development';
-require_once __DIR__ . '/includes/header.php';
+/**
+ * Chandila Web Development – Customer Project Portal Login
+ */
+require_once __DIR__ . '/config/config.php';
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/includes/functions.php';
 
 $pdo = getDB();
 $errorMessage = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'customer_login') {
     if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
-        $errorMessage = "Security token expired.";
+        $errorMessage = "Security token expired. Please refresh the page.";
     } else {
         $jobId = trim($_POST['job_id'] ?? '');
         $phone = trim($_POST['phone'] ?? '');
@@ -20,6 +25,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
     }
 }
+
+// Disable preloader on customer login
+$disablePreloader = true;
+$pageTitle = 'Customer Project Portal – Chandila Web Development';
+require_once __DIR__ . '/includes/header.php';
 ?>
 
 <div class="py-5" style="background: linear-gradient(180deg, #f1f5f9 0%, #f8fafc 100%); min-height: 80vh; display: flex; align-items: center;">

@@ -4,6 +4,27 @@
  */
 
 document.addEventListener('DOMContentLoaded', function () {
+    // 0. Maintain Sidebar Scroll Position Seamlessly Across Page Transitions
+    const adminSidebar = document.querySelector('.admin-sidebar');
+    if (adminSidebar) {
+        const savedScroll = sessionStorage.getItem('chandila_admin_sidebar_scroll');
+        if (savedScroll !== null) {
+            adminSidebar.scrollTop = parseInt(savedScroll, 10);
+        }
+
+        // Save position as user scrolls the sidebar
+        adminSidebar.addEventListener('scroll', function () {
+            sessionStorage.setItem('chandila_admin_sidebar_scroll', adminSidebar.scrollTop);
+        }, { passive: true });
+
+        // Also capture exact scroll position before following any navigation link
+        adminSidebar.querySelectorAll('.admin-menu-link').forEach(link => {
+            link.addEventListener('click', function () {
+                sessionStorage.setItem('chandila_admin_sidebar_scroll', adminSidebar.scrollTop);
+            });
+        });
+    }
+
     // 1. Mobile Sidebar Toggle
     const sidebarToggle = document.getElementById('sidebarToggleBtn');
     const sidebar = document.querySelector('.admin-sidebar');

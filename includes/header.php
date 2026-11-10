@@ -31,9 +31,12 @@ $pageTitle = $pageTitle ?? 'Chandila Web Development – Where Innovation Meets 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Custom Public CSS -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/style.css?v=<?php echo filemtime(__DIR__ . '/../assets/css/style.css'); ?>">
+    <!-- Toast Notification System (Early Load) -->
+    <script src="<?php echo BASE_URL; ?>/assets/js/toast.js"></script>
 </head>
 <body>
 
+    <?php if (empty($disablePreloader)): ?>
     <!-- Site Animated Preloader (Initial Page Load Animation) -->
     <div id="sitePreloader" class="site-preloader">
         <div class="preloader-content">
@@ -46,6 +49,25 @@ $pageTitle = $pageTitle ?? 'Chandila Web Development – Where Innovation Meets 
             <div class="preloader-tagline">Where Innovation Meets Growth</div>
         </div>
     </div>
+    <script>
+    (function () {
+        var preloader = document.getElementById('sitePreloader');
+        if (!preloader) return;
+        function hide() {
+            if (preloader && !preloader.classList.contains('fade-out')) {
+                preloader.classList.add('fade-out');
+                setTimeout(function () {
+                    preloader.style.display = 'none';
+                }, 500);
+            }
+        }
+        window.addEventListener('load', function () {
+            setTimeout(hide, 300);
+        });
+        setTimeout(hide, 1200);
+    })();
+    </script>
+    <?php endif; ?>
 
     <!-- Top Contact Bar -->
     <div class="top-contact-bar py-2 d-none d-md-block">

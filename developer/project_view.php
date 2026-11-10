@@ -1,8 +1,16 @@
 <?php
 $devTitle = 'Developer Project Workspace';
-require_once __DIR__ . '/../includes/dev_header.php';
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../config/whatsapp_config.php';
 
+// Strict Developer Gate
+requireDeveloper();
+
+$pdo = getDB();
+$currentUser = getCurrentUser();
 $projectId = (int)($_GET['id'] ?? 0);
 $devId = $currentUser['id'];
 
@@ -23,6 +31,7 @@ $project = $stmt->fetch();
 
 if (!$project) {
     http_response_code(403);
+    require_once __DIR__ . '/../includes/dev_header.php';
     ?>
     <div class="admin-card p-5 text-center my-5 mx-auto" style="max-width: 600px;">
         <i class="fa-solid fa-lock fa-4x text-danger mb-3"></i>
@@ -142,6 +151,8 @@ $progressLogs = $progressHistory->fetchAll();
 $files = $pdo->prepare("SELECT * FROM uploaded_files WHERE project_id = ? ORDER BY created_at DESC");
 $files->execute([$projectId]);
 $fileList = $files->fetchAll();
+
+require_once __DIR__ . '/../includes/dev_header.php';
 ?>
 
 <!-- Top Header -->

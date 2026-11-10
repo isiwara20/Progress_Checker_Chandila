@@ -53,9 +53,19 @@ body.admin-body {
   bottom: 0;
   left: 0;
   z-index: 1040;
-  transition: all 0.3s ease;
   overflow-y: auto;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.02);
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.admin-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 4px;
 }
 
 .admin-sidebar-brand {
@@ -101,8 +111,9 @@ body.admin-body {
   text-decoration: none;
   font-weight: 500;
   font-size: 0.92rem;
-  transition: all 0.2s ease;
+  transition: background 0.15s ease, color 0.15s ease;
   gap: 12px;
+  border-left: 3px solid transparent;
 }
 
 .admin-menu-link i {
@@ -110,7 +121,7 @@ body.admin-body {
   width: 22px;
   text-align: center;
   color: #64748b;
-  transition: all 0.2s ease;
+  transition: color 0.15s ease;
 }
 
 .admin-menu-link:hover {
@@ -125,7 +136,7 @@ body.admin-body {
 .admin-menu-link.active {
   background: #eff6ff;
   color: #1d4ed8;
-  border-left: 3px solid var(--admin-gold);
+  border-left-color: var(--admin-gold);
   font-weight: 600;
 }
 
@@ -170,12 +181,16 @@ body.admin-body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  transition: all 0.3s ease;
   background-color: var(--admin-content-bg);
+  padding-top: 70px;
 }
 
-/* Admin Top Bar */
+/* Admin Top Bar (Fixed Header on Desktop & Mobile) */
 .admin-topbar {
+  position: fixed;
+  top: 0;
+  left: 270px;
+  right: 0;
   height: 70px;
   background-color: #ffffff;
   border-bottom: 1px solid var(--admin-border);
@@ -183,10 +198,8 @@ body.admin-body {
   align-items: center;
   justify-content: space-between;
   padding: 0 30px;
-  position: sticky;
-  top: 0;
   z-index: 1030;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
 .sidebar-toggle-btn {
@@ -400,6 +413,7 @@ body.admin-body {
 @media (max-width: 991px) {
   .admin-sidebar {
     left: -270px;
+    transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .admin-sidebar.show {
     left: 0;
@@ -407,6 +421,10 @@ body.admin-body {
   }
   .admin-main-content {
     margin-left: 0;
+    padding-top: 70px;
+  }
+  .admin-topbar {
+    left: 0;
   }
   .sidebar-toggle-btn {
     display: inline-block;
@@ -417,6 +435,9 @@ body.admin-body {
   .admin-topbar {
     padding: 0 15px;
     height: 60px;
+  }
+  .admin-main-content {
+    padding-top: 60px;
   }
   .admin-body-content {
     padding: 16px 12px;
