@@ -1,7 +1,16 @@
 <?php
 $adminTitle = 'WhatsApp Notification Center';
-require_once __DIR__ . '/../includes/admin_header.php';
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../config/whatsapp_config.php';
+
+// Strict Admin Gate
+requireAdmin();
+
+$pdo = getDB();
+$currentUser = getCurrentUser();
 
 // Handle Manual Ad-Hoc Test Send
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'send_adhoc_whatsapp') {
@@ -35,6 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         }
     }
 }
+
+require_once __DIR__ . '/../includes/admin_header.php';
 
 // Fetch WhatsApp Provider setting
 $currentProvider = WhatsAppService::getSetting($pdo, 'whatsapp_provider', 'simulator');

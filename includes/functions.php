@@ -232,17 +232,74 @@ function getFlash(string $type): ?string {
 }
 
 function renderFlashAlerts(): string {
-    $out = '';
-    $types = ['success' => 'alert-success', 'error' => 'alert-danger', 'info' => 'alert-info', 'warning' => 'alert-warning'];
-    foreach ($types as $key => $class) {
+    $types = [
+        'success' => [
+            'title'     => 'Action Completed',
+            'icon'      => 'fa-solid fa-circle-check',
+            'border'    => '#10b981',
+            'iconColor' => '#059669',
+            'iconBg'    => '#ecfdf5',
+        ],
+        'error' => [
+            'title'     => 'Attention Required',
+            'icon'      => 'fa-solid fa-circle-exclamation',
+            'border'    => '#ef4444',
+            'iconColor' => '#dc2626',
+            'iconBg'    => '#fef2f2',
+        ],
+        'warning' => [
+            'title'     => 'System Notice',
+            'icon'      => 'fa-solid fa-triangle-exclamation',
+            'border'    => '#f59e0b',
+            'iconColor' => '#d97706',
+            'iconBg'    => '#fffbeb',
+        ],
+        'info' => [
+            'title'     => 'Update',
+            'icon'      => 'fa-solid fa-circle-info',
+            'border'    => '#2563eb',
+            'iconColor' => '#2563eb',
+            'iconBg'    => '#eff6ff',
+        ],
+    ];
+
+    $cardsHtml = '';
+    $hasAlerts = false;
+
+    foreach ($types as $key => $meta) {
         $msg = getFlash($key);
         if ($msg) {
-            $out .= "<div class=\"alert {$class} alert-dismissible fade show\" role=\"alert\">"
-                  . htmlspecialchars($msg)
-                  . "<button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"alert\" aria-label=\"Close\"></button>"
-                  . "</div>";
+            $hasAlerts = true;
+            $toastId = 'toast_' . uniqid();
+            $safeMsg = nl2br(htmlspecialchars($msg));
+            $cardsHtml .= "
+            <div class=\"chandila-toast-card toast-type-{$key}\" id=\"{$toastId}\" data-toast-id=\"{$toastId}\" role=\"alert\" style=\"border-left-color: {$meta['border']};\">
+                <div class=\"chandila-toast-body\">
+                    <div class=\"chandila-toast-icon\" style=\"background: {$meta['iconBg']}; color: {$meta['iconColor']};\">
+                        <i class=\"{$meta['icon']}\"></i>
+                    </div>
+                    <div class=\"chandila-toast-content\">
+                        <div class=\"chandila-toast-header\">
+                            <span class=\"chandila-toast-title\">{$meta['title']}</span>
+                            <span class=\"chandila-toast-time\">Just now</span>
+                        </div>
+                        <div class=\"chandila-toast-message\">{$safeMsg}</div>
+                    </div>
+                    <button type=\"button\" class=\"chandila-toast-close\" onclick=\"dismissChandilaToast('{$toastId}')\" aria-label=\"Close\">
+                        <i class=\"fa-solid fa-xmark\"></i>
+                    </button>
+                </div>
+                <div class=\"chandila-toast-progress-bar\" style=\"background-color: {$meta['border']};\"></div>
+            </div>";
         }
     }
+
+    $out = '<div id="chandilaToastContainer" class="chandila-toast-container" aria-live="polite">';
+    if ($hasAlerts) {
+        $out .= $cardsHtml;
+    }
+    $out .= '</div>';
+
     return $out;
 }
 

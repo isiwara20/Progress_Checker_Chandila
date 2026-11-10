@@ -1,7 +1,15 @@
 <?php
 $devTitle = 'Developer Profile & Skills';
-require_once __DIR__ . '/../includes/dev_header.php';
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/functions.php';
 
+// Strict Developer Gate
+requireDeveloper();
+
+$pdo = getDB();
+$currentUser = getCurrentUser();
 $devId = $currentUser['id'];
 
 // Handle Profile & Password Updates
@@ -56,6 +64,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
     }
 }
+
+require_once __DIR__ . '/../includes/dev_header.php';
 
 // Fetch fresh user data
 $userData = $pdo->query("SELECT * FROM users WHERE id = {$devId}")->fetch();

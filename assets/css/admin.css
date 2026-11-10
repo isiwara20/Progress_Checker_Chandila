@@ -466,3 +466,157 @@ body.admin-body {
     font-size: 0.88rem;
   }
 }
+
+/* ==========================================================================
+   Chandila Modern Bottom-Right Corner Toast Notification System
+   ========================================================================== */
+.chandila-toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 420px;
+  width: calc(100vw - 36px);
+  pointer-events: none;
+}
+
+.chandila-toast-card {
+  pointer-events: auto;
+  position: relative;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-left: 5px solid #2563eb;
+  box-shadow: 0 14px 38px rgba(15, 23, 42, 0.16), 0 4px 12px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+  transition: transform 0.25s ease, opacity 0.25s ease, box-shadow 0.25s ease;
+  animation: toastSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.chandila-toast-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 46px rgba(15, 23, 42, 0.22);
+}
+
+.chandila-toast-card.toast-dismissing {
+  opacity: 0;
+  transform: translateX(110%);
+  transition: all 0.28s ease-in;
+}
+
+.chandila-toast-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.chandila-toast-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.chandila-toast-content {
+  flex-grow: 1;
+  min-width: 0;
+  padding-top: 1px;
+}
+
+.chandila-toast-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.chandila-toast-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.chandila-toast-time {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.chandila-toast-message {
+  font-size: 0.84rem;
+  color: #334155;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.chandila-toast-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.chandila-toast-close:hover {
+  color: #0f172a;
+  background: #f1f5f9;
+}
+
+.chandila-toast-progress-bar {
+  height: 3px;
+  width: 100%;
+  background-color: #2563eb;
+  transform-origin: left;
+  animation: toastProgressShrink 5s linear forwards;
+}
+
+.chandila-toast-card:hover .chandila-toast-progress-bar {
+  animation-play-state: paused;
+}
+
+@keyframes toastSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toastProgressShrink {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@media (max-width: 576px) {
+  .chandila-toast-container {
+    bottom: 16px;
+    right: 12px;
+    left: 12px;
+    width: auto;
+    max-width: 100%;
+  }
+}

@@ -1,7 +1,16 @@
 <?php
 $adminTitle = 'New Project Requests';
-require_once __DIR__ . '/../includes/admin_header.php';
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../config/whatsapp_config.php';
+
+// Strict Admin Gate
+requireAdmin();
+
+$pdo = getDB();
+$currentUser = getCurrentUser();
 
 // Handle Review / Approval / Rejection Actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
@@ -118,6 +127,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
     }
 }
+
+require_once __DIR__ . '/../includes/admin_header.php';
 
 // Fetch Developers for Assignment Dropdown
 $developers = $pdo->query("SELECT id, full_name, skills FROM users WHERE role = 'developer' AND status = 'active' ORDER BY full_name ASC")->fetchAll();

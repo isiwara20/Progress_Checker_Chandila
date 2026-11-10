@@ -1,7 +1,16 @@
 <?php
 $adminTitle = 'Payment Management System';
-require_once __DIR__ . '/../includes/admin_header.php';
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../config/whatsapp_config.php';
+
+// Strict Admin Gate
+requireAdmin();
+
+$pdo = getDB();
+$currentUser = getCurrentUser();
 
 // Handle Payment Verification / Rejection
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
@@ -53,6 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
     }
 }
+
+require_once __DIR__ . '/../includes/admin_header.php';
 
 // Fetch Overall Financial Metrics
 $totalRevenue = (float)$pdo->query("SELECT COALESCE(SUM(amount), 0) FROM payments WHERE status = 'Payment Received'")->fetchColumn();

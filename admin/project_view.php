@@ -1,7 +1,16 @@
 <?php
 $adminTitle = 'Project Management Command Center';
-require_once __DIR__ . '/../includes/admin_header.php';
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../config/whatsapp_config.php';
+
+// Strict Admin Gate
+requireAdmin();
+
+$pdo = getDB();
+$currentUser = getCurrentUser();
 
 $projectId = (int)($_GET['id'] ?? 0);
 if (!$projectId) {
@@ -270,6 +279,8 @@ $activityList = $activities->fetchAll();
 $files = $pdo->prepare("SELECT * FROM uploaded_files WHERE project_id = ? ORDER BY created_at DESC");
 $files->execute([$projectId]);
 $fileList = $files->fetchAll();
+
+require_once __DIR__ . '/../includes/admin_header.php';
 ?>
 
 <!-- Project Command Header -->
