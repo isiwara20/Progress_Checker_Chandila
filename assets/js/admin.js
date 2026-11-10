@@ -248,6 +248,9 @@ function initWhatsAppResend() {
             .then(data => {
                 if (data.success) {
                     this.innerHTML = '<i class="fa-solid fa-check text-success"></i> Sent!';
+                    if (window.showChandilaToast) {
+                        showChandilaToast('success', 'WhatsApp notification dispatched successfully to customer!', 'Notification Sent');
+                    }
                     const row = document.getElementById('notif_row_' + notifId);
                     if (row) {
                         const statusBadge = row.querySelector('.notif-status-badge');
@@ -261,14 +264,22 @@ function initWhatsAppResend() {
                         this.disabled = false;
                     }, 3000);
                 } else {
-                    alert('Failed to resend: ' + (data.message || 'Unknown error'));
+                    if (window.showChandilaToast) {
+                        showChandilaToast('error', data.message || 'Failed to resend WhatsApp notification', 'Dispatch Error');
+                    } else {
+                        alert('Failed to resend: ' + (data.message || 'Unknown error'));
+                    }
                     this.innerHTML = originalText;
                     this.disabled = false;
                 }
             })
             .catch(err => {
                 console.error(err);
-                alert('Connection error. Please try again.');
+                if (window.showChandilaToast) {
+                    showChandilaToast('error', 'Network or server error. Please try again.', 'Connection Error');
+                } else {
+                    alert('Connection error. Please try again.');
+                }
                 this.innerHTML = originalText;
                 this.disabled = false;
             });
@@ -297,9 +308,16 @@ function initMilestoneChecklist() {
             .then(res => res.json())
             .then(data => {
                 if (!data.success) {
-                    alert(data.message || 'Failed to update milestone');
+                    if (window.showChandilaToast) {
+                        showChandilaToast('error', data.message || 'Failed to update milestone', 'Update Error');
+                    } else {
+                        alert(data.message || 'Failed to update milestone');
+                    }
                     this.checked = !this.checked;
                 } else {
+                    if (window.showChandilaToast) {
+                        showChandilaToast('success', isCompleted ? 'Milestone marked as completed.' : 'Milestone reopened.', 'Sprint Progress');
+                    }
                     const label = document.getElementById('milestone_label_' + milestoneId);
                     if (label) {
                         if (isCompleted) {
@@ -312,6 +330,9 @@ function initMilestoneChecklist() {
             })
             .catch(err => {
                 console.error(err);
+                if (window.showChandilaToast) {
+                    showChandilaToast('error', 'Connection error updating milestone.', 'Network Error');
+                }
                 this.checked = !this.checked;
             });
         });

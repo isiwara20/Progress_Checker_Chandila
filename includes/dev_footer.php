@@ -20,6 +20,8 @@
 <script>
     window.BASE_URL = '<?php echo BASE_URL; ?>';
 </script>
+<!-- Toast Notification Scripts -->
+<script src="<?php echo BASE_URL; ?>/assets/js/toast.js"></script>
 <script src="<?php echo BASE_URL; ?>/assets/js/admin.js"></script>
 </body>
 </html>

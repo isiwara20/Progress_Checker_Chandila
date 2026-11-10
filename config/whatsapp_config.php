@@ -134,7 +134,49 @@ class WhatsAppService {
         $isSuccess = false;
 
         // 3. Dispatch based on provider
-        if ($provider === 'ultramsg' && !empty($apiUrl) && !empty($apiToken)) {
+        if ($provider === 'waclient' && !empty($apiUrl)) {
+            // WA Client (WhatsApp Web Client Gateway / Local Node.js / Baileys / WPP)
+            $payload = json_encode([
+                'phone'      => $cleanPhone,
+                'number'     => $cleanPhone . '@c.us',
+                'to'         => '+' . $cleanPhone,
+                'chatId'     => $cleanPhone . '@c.us',
+                'message'    => $message,
+                'text'       => $message,
+                'job_id'     => $jobId,
+                'event_type' => $eventType,
+                'timestamp'  => date('Y-m-d H:i:s')
+            ]);
+
+            $headers = ['Content-Type: application/json'];
+            if (!empty($apiToken)) {
+                $headers[] = 'Authorization: Bearer ' . $apiToken;
+                $headers[] = 'x-api-key: ' . $apiToken;
+            }
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $apiUrl);
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($response && !$curlError && $httpCode >= 200 && $httpCode < 400) {
+                $status = 'Sent';
+                $apiResponse = $response;
+                $isSuccess = true;
+            } else {
+                $status = 'Failed';
+                $apiResponse = $curlError ? "cURL Error: {$curlError}" : "WA Client returned HTTP {$httpCode}: {$response}";
+            }
+        } elseif ($provider === 'ultramsg' && !empty($apiUrl) && !empty($apiToken)) {
             $params = [
                 'token' => $apiToken,
                 'to'    => '+' . $cleanPhone,

@@ -36,10 +36,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     </div>
 
                     <?php if (!empty($errorMessage)): ?>
-                        <div class="alert alert-danger border-danger text-danger mb-4 py-2 px-3 small">
-                            <i class="fa-solid fa-circle-exclamation me-2"></i> <?php echo htmlspecialchars($errorMessage); ?>
-                        </div>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                showChandilaToast('error', <?php echo json_encode($errorMessage); ?>, 'Access Denied');
+                            });
+                        </script>
                     <?php endif; ?>
+
+                    <?php echo renderFlashAlerts(); ?>
 
                     <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST">
                         <?php echo csrfField(); ?>

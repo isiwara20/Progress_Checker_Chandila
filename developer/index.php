@@ -163,5 +163,20 @@ $assignedProjects = $pdo->query("
     </div>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    <?php if ($ongoingCount > 0): ?>
+        setTimeout(() => {
+            showChandilaToast(
+                'info',
+                'You have <strong><?php echo $ongoingCount; ?></strong> active development sprint(s) in progress. <a href="<?php echo BASE_URL; ?>/developer/my_projects.php" class="text-primary fw-bold ms-1 text-decoration-underline">View Queue &rarr;</a>',
+                'Active Sprints',
+                7000
+            );
+        }, 600);
+    <?php endif; ?>
+});
+</script>
+
 <?php require_once __DIR__ . '/../includes/dev_footer.php'; ?>
 

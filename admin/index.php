@@ -432,5 +432,32 @@ if ($pdo) {
     </div>
 </div>
 
+<!-- Admin Dashboard Real-Time Notifications Popup -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    <?php if ($newRequestsCount > 0): ?>
+        setTimeout(() => {
+            showChandilaToast(
+                'warning', 
+                'You have <strong><?php echo $newRequestsCount; ?></strong> inbound project request(s) awaiting pricing and review. <a href="<?php echo BASE_URL; ?>/admin/requests.php" class="text-primary fw-bold ms-1 text-decoration-underline">Review Requests &rarr;</a>', 
+                'Pending Inbound Requests', 
+                8000
+            );
+        }, 600);
+    <?php endif; ?>
+
+    <?php if ($pendingPaymentsCount > 0): ?>
+        setTimeout(() => {
+            showChandilaToast(
+                'info', 
+                'There are <strong><?php echo $pendingPaymentsCount; ?></strong> payment transaction(s) pending verification. <a href="<?php echo BASE_URL; ?>/admin/payments.php" class="text-primary fw-bold ms-1 text-decoration-underline">Verify Payments &rarr;</a>', 
+                'Payment Verification Pending', 
+                9000
+            );
+        }, 1200);
+    <?php endif; ?>
+});
+</script>
+
 <?php require_once __DIR__ . '/../includes/admin_footer.php'; ?>
 
