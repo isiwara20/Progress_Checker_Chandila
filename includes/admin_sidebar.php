@@ -1,0 +1,158 @@
+<?php
+/**
+ * Chandila Web Development – Admin Sidebar Component
+ * Includes the 12 required modules from specifications
+ */
+$currentPage = basename($_SERVER['PHP_SELF']);
+?>
+<aside class="admin-sidebar">
+    <!-- Brand Title -->
+    <div class="admin-sidebar-brand">
+        <a href="<?php echo BASE_URL; ?>/admin/index.php" class="d-flex align-items-center justify-content-center text-decoration-none">
+            <img src="<?php echo BASE_URL; ?>/assets/images/logo.png" alt="Chandila Web Development" class="admin-logo-img">
+        </a>
+    </div>
+
+    <!-- Sidebar 12-Item Navigation Menu -->
+    <ul class="admin-sidebar-menu">
+        <li class="admin-menu-header">Overview</li>
+
+        <!-- 1. Dashboard -->
+        <li class="admin-menu-item">
+            <a href="<?php echo BASE_URL; ?>/admin/index.php" class="admin-menu-link <?php echo ($currentPage === 'index.php') ? 'active' : ''; ?>">
+                <i class="fa-solid fa-gauge-high"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+
+        <li class="admin-menu-header">Project Operations</li>
+
+        <!-- 2. New Project Requests -->
+        <li class="admin-menu-item">
+            <a href="<?php echo BASE_URL; ?>/admin/requests.php" class="admin-menu-link <?php echo ($currentPage === 'requests.php') ? 'active' : ''; ?>">
+                <i class="fa-solid fa-inbox"></i>
+                <span>New Requests</span>
+                <?php if (!empty($pendingReqCount)): ?>
+                    <span class="admin-menu-badge bg-danger text-white"><?php echo $pendingReqCount; ?></span>
+                <?php endif; ?>
+            </a>
+        </li>
+
+        <!-- 3. All Projects -->
+        <li class="admin-menu-item">
+            <a href="<?php echo BASE_URL; ?>/admin/projects.php" class="admin-menu-link <?php echo in_array($currentPage, ['projects.php', 'project_view.php']) ? 'active' : ''; ?>">
+                <i class="fa-solid fa-diagram-project"></i>
+                <span>All Projects</span>
+            </a>
+        </li>
+
+        <!-- 4. Manage Customers -->
+        <li class="admin-menu-item">
+            <a href="<?php echo BASE_URL; ?>/admin/customers.php" class="admin-menu-link <?php echo ($currentPage === 'customers.php') ? 'active' : ''; ?>">
+                <i class="fa-solid fa-users"></i>
+                <span>Manage Customers</span>
+            </a>
+        </li>
+
+        <!-- 5. Manage Developers -->
+        <li class="admin-menu-item">
+            <a href="<?php echo BASE_URL; ?>/admin/developers.php" class="admin-menu-link <?php echo ($currentPage === 'developers.php') ? 'active' : ''; ?>">
+                <i class="fa-solid fa-laptop-code"></i>
+                <span>Manage Developers</span>
+            </a>
+        </li>
+
+        <!-- 6. Assign Projects -->
+        <li class="admin-menu-item">
+            <a href="<?php echo BASE_URL; ?>/admin/assign.php" class="admin-menu-link <?php echo ($currentPage === 'assign.php') ? 'active' : ''; ?>">
+                <i class="fa-solid fa-user-check"></i>
+                <span>Assign Projects</span>
+            </a>
+        </li>
+
+        <li class="admin-menu-header">Finance & Progress</li>
+
+        <!-- 7. Payment Management -->
+        <li class="admin-menu-item">
+            <a href="<?php echo BASE_URL; ?>/admin/payments.php" class="admin-menu-link <?php echo ($currentPage === 'payments.php') ? 'active' : ''; ?>">
+                <i class="fa-solid fa-credit-card"></i>
+                <span>Payment Management</span>
+                <?php if (!empty($pendingPayCount)): ?>
+                    <span class="admin-menu-badge bg-warning text-dark"><?php echo $pendingPayCount; ?></span>
+                <?php endif; ?>
+            </a>
+        </li>
+
+        <!-- 8. Project Progress -->
+        <li class="admin-menu-item">
+            <a href="<?php echo BASE_URL; ?>/admin/progress.php" class="admin-menu-link <?php echo ($currentPage === 'progress.php') ? 'active' : ''; ?>">
+                <i class="fa-solid fa-bars-progress"></i>
+                <span>Project Progress</span>
+            </a>
+        </li>
+
+        <li class="admin-menu-header">Media & Careers</li>
+
+        <!-- Posts & Showcase (1080x1080) -->
+        <li class="admin-menu-item">
+            <a href="<?php echo BASE_URL; ?>/admin/posts.php" class="admin-menu-link <?php echo ($currentPage === 'posts.php') ? 'active' : ''; ?>">
+                <i class="fa-solid fa-photo-film text-warning"></i>
+                <span>Posts & Showcase (1:1)</span>
+            </a>
+        </li>
+
+        <!-- Job Applications -->
+        <li class="admin-menu-item">
+            <a href="<?php echo BASE_URL; ?>/admin/careers.php" class="admin-menu-link <?php echo ($currentPage === 'careers.php') ? 'active' : ''; ?>">
+                <i class="fa-solid fa-user-tie text-info"></i>
+                <span>Career Applicants</span>
+            </a>
+        </li>
+
+        <li class="admin-menu-header">Communication & System</li>
+
+        <!-- 9. WhatsApp Notifications -->
+        <li class="admin-menu-item">
+            <a href="<?php echo BASE_URL; ?>/admin/whatsapp.php" class="admin-menu-link <?php echo ($currentPage === 'whatsapp.php') ? 'active' : ''; ?>">
+                <i class="fa-brands fa-whatsapp text-success"></i>
+                <span>WhatsApp Log</span>
+            </a>
+        </li>
+
+        <!-- 10. Reports -->
+        <li class="admin-menu-item">
+            <a href="<?php echo BASE_URL; ?>/admin/reports.php" class="admin-menu-link <?php echo ($currentPage === 'reports.php') ? 'active' : ''; ?>">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Reports & Analytics</span>
+            </a>
+        </li>
+
+        <!-- 11. Settings -->
+        <li class="admin-menu-item">
+            <a href="<?php echo BASE_URL; ?>/admin/settings.php" class="admin-menu-link <?php echo ($currentPage === 'settings.php') ? 'active' : ''; ?>">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </a>
+        </li>
+
+        <!-- 12. Logout -->
+        <li class="admin-menu-item mt-3 pt-2 border-top border-secondary border-opacity-25">
+            <a href="<?php echo BASE_URL; ?>/logout.php" class="admin-menu-link text-danger">
+                <i class="fa-solid fa-arrow-right-from-bracket text-danger"></i>
+                <span>Logout</span>
+            </a>
+        </li>
+    </ul>
+
+    <!-- Sidebar User Footer -->
+    <div class="admin-sidebar-footer">
+        <div class="user-avatar-circle">
+            <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <div class="overflow-hidden">
+            <div class="text-dark small fw-bold text-truncate"><?php echo htmlspecialchars($currentUser['full_name']); ?></div>
+            <div class="text-muted small" style="font-size: 0.72rem;">Administrator</div>
+        </div>
+    </div>
+</aside>
+

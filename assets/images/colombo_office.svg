@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 360" width="100%" height="100%">
+  <defs>
+    <linearGradient id="offBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+  </defs>
+  <rect width="600" height="360" rx="20" fill="url(#offBg)" stroke="#f59e0b" stroke-width="1.5" />
+  <g transform="translate(50, 45)">
+    <text x="250" y="30" fill="#f59e0b" font-family="sans-serif" font-size="13" font-weight="700" text-anchor="middle" letter-spacing="2">HEADQUARTERS &amp; INNOVATION LAB</text>
+    <text x="250" y="70" fill="#ffffff" font-family="sans-serif" font-size="24" font-weight="800" text-anchor="middle">Colombo 03, Sri Lanka</text>
+    <text x="250" y="100" fill="#cbd5e1" font-family="sans-serif" font-size="14" text-anchor="middle">No. 45, Galle Road, Colombo 03, Western Province</text>
+    
+    <g transform="translate(60, 140)">
+      <rect width="380" height="90" rx="12" fill="#1e293b" stroke="#334155" />
+      <text x="190" y="34" fill="#38bdf8" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle">Direct Hotline &amp; WhatsApp: 076 843 3340</text>
+      <text x="190" y="58" fill="#94a3b8" font-family="sans-serif" font-size="12" text-anchor="middle">Email: contact@chandilaweb.com</text>
+      <text x="190" y="76" fill="#e2e8f0" font-family="sans-serif" font-size="11" text-anchor="middle">Mon - Sat: 9:00 AM - 6:00 PM (IST)</text>
+    </g>
+  </g>
+</svg>
