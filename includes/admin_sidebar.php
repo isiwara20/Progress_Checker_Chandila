@@ -54,11 +54,19 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             </a>
         </li>
 
-        <!-- 5. Manage Developers -->
+        <!-- 5. Manage Staff & Developers -->
         <li class="admin-menu-item">
             <a href="<?php echo BASE_URL; ?>/admin/developers.php" class="admin-menu-link <?php echo ($currentPage === 'developers.php') ? 'active' : ''; ?>">
-                <i class="fa-solid fa-laptop-code"></i>
-                <span>Manage Developers</span>
+                <i class="fa-solid fa-users-gear"></i>
+                <span>Staff & Developers</span>
+            </a>
+        </li>
+
+        <!-- Customer Care Portal Link -->
+        <li class="admin-menu-item">
+            <a href="<?php echo BASE_URL; ?>/care/index.php" class="admin-menu-link">
+                <i class="fa-solid fa-headset text-warning"></i>
+                <span>Customer Care Desk</span>
             </a>
         </li>
 

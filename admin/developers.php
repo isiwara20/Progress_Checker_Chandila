@@ -23,7 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $fullName = trim($_POST['full_name'] ?? '');
             $email    = trim($_POST['email'] ?? '');
             $phone    = trim($_POST['phone'] ?? '');
-            $skills   = trim($_POST['skills'] ?? 'Full Stack Web Development');
+            $role     = in_array($_POST['role'] ?? '', ['developer', 'customer_care'], true) ? $_POST['role'] : 'developer';
+            $skills   = trim($_POST['skills'] ?? ($role === 'customer_care' ? 'Customer Relations & Order Intake' : 'Full Stack Web Development'));
             $password = $_POST['password'] ?? '';
 
             if (empty($username) || empty($fullName) || empty($email) || empty($password)) {
@@ -38,11 +39,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $hash = password_hash($password, PASSWORD_BCRYPT);
                     $ins = $pdo->prepare("
                         INSERT INTO users (username, email, password_hash, full_name, phone, role, skills, status, created_at)
-                        VALUES (?, ?, ?, ?, ?, 'developer', ?, 'active', NOW())
+                        VALUES (?, ?, ?, ?, ?, ?, ?, 'active', NOW())
                     ");
-                    $ins->execute([$username, $email, $hash, $fullName, $phone, $skills]);
+                    $ins->execute([$username, $email, $hash, $fullName, $phone, $role, $skills]);
 
-                    setFlash('success', "Developer '{$fullName}' account created successfully!");
+                    $roleLabel = ($role === 'customer_care') ? 'Customer Care' : 'Developer';
+                    setFlash('success', "{$roleLabel} '{$fullName}' account created successfully!");
                     header("Location: " . BASE_URL . "/admin/developers.php");
                     exit;
                 }
@@ -50,8 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         } elseif ($action === 'toggle_status') {
             $devId = (int)($_POST['developer_id'] ?? 0);
             $newStatus = ($_POST['status'] === 'active') ? 'inactive' : 'active';
-            $pdo->prepare("UPDATE users SET status = ? WHERE id = ? AND role = 'developer'")->execute([$newStatus, $devId]);
-            setFlash('info', "Developer account status updated to {$newStatus}.");
+            $pdo->prepare("UPDATE users SET status = ? WHERE id = ? AND role IN ('developer', 'customer_care')")->execute([$newStatus, $devId]);
+            setFlash('info', "Staff account status updated to {$newStatus}.");
             header("Location: " . BASE_URL . "/admin/developers.php");
             exit;
         }
@@ -60,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
 require_once __DIR__ . '/../includes/admin_header.php';
 
-// Fetch all developers with active/completed workload metrics
+// Fetch all developers and customer care staff with workload metrics
 $developers = $pdo->query("
     SELECT u.*,
            COUNT(p.id) AS total_assigned,
@@ -68,20 +70,20 @@ $developers = $pdo->query("
            COUNT(CASE WHEN p.status IN ('Project Completed', 'Project Delivered') THEN 1 END) AS completed_count
     FROM users u
     LEFT JOIN projects p ON u.id = p.assigned_developer_id
-    WHERE u.role = 'developer'
+    WHERE u.role IN ('developer', 'customer_care')
     GROUP BY u.id
-    ORDER BY u.created_at ASC
+    ORDER BY u.role DESC, u.created_at ASC
 ")->fetchAll();
 ?>
 
 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
     <div>
-        <h3 class="text-dark fw-bold mb-1"><i class="fa-solid fa-laptop-code text-primary me-2"></i> Engineering Team Management</h3>
-        <p class="text-secondary small mb-0">Manage developer logins, credentials, assigned workloads, and tech skillsets.</p>
+        <h3 class="text-dark fw-bold mb-1"><i class="fa-solid fa-users text-primary me-2"></i> Staff & Team Management</h3>
+        <p class="text-secondary small mb-0">Manage developer and customer care logins, credentials, workloads, and department roles.</p>
     </div>
     <div>
         <button type="button" class="btn btn-electric btn-sm" data-bs-toggle="modal" data-bs-target="#modalAddDeveloper">
-            <i class="fa-solid fa-user-plus me-1"></i> Add New Developer
+            <i class="fa-solid fa-user-plus me-1"></i> Add New Staff Member
         </button>
     </div>
 </div>
@@ -93,12 +95,17 @@ $developers = $pdo->query("
             <div class="chandila-card h-100 p-4">
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div class="d-flex align-items-center gap-3">
-                        <div class="user-avatar-circle" style="width: 50px; height: 50px; font-size: 1.4rem;">
-                            <i class="fa-solid fa-laptop-code"></i>
+                        <div class="user-avatar-circle" style="width: 50px; height: 50px; font-size: 1.4rem; background: <?php echo ($dev['role'] === 'customer_care') ? '#fef3c7; color: #b45309;' : '#e0e7ff; color: #4338ca;'; ?>">
+                            <i class="fa-solid <?php echo ($dev['role'] === 'customer_care') ? 'fa-headset' : 'fa-laptop-code'; ?>"></i>
                         </div>
                         <div>
                             <h5 class="text-dark fw-bold mb-0"><?php echo htmlspecialchars($dev['full_name']); ?></h5>
                             <span class="text-secondary small">@<?php echo htmlspecialchars($dev['username']); ?></span>
+                            <div>
+                                <span class="badge <?php echo ($dev['role'] === 'customer_care') ? 'bg-warning-subtle text-dark border border-warning-subtle' : 'bg-primary-subtle text-primary border border-primary-subtle'; ?> py-0 px-2 mt-1" style="font-size: 0.7rem;">
+                                    <?php echo ($dev['role'] === 'customer_care') ? 'Customer Care' : 'Developer'; ?>
+                                </span>
+                            </div>
                         </div>
                     </div>
                     <?php if ($dev['status'] === 'active'): ?>
@@ -109,8 +116,8 @@ $developers = $pdo->query("
                 </div>
 
                 <div class="mb-3">
-                    <span class="text-secondary small d-block">Specializations:</span>
-                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-20"><?php echo htmlspecialchars($dev['skills']); ?></span>
+                    <span class="text-secondary small d-block">Responsibilities / Skills:</span>
+                    <span class="badge bg-light text-dark border text-truncate d-inline-block" style="max-width: 100%;"><?php echo htmlspecialchars($dev['skills']); ?></span>
                 </div>
 
                 <div class="row g-2 text-center mb-4 pt-2 border-top">
@@ -156,23 +163,31 @@ $developers = $pdo->query("
                 <input type="hidden" name="action" value="create_developer">
 
                 <div class="modal-header">
-                    <h5 class="modal-title text-dark fw-bold"><i class="fa-solid fa-user-plus text-primary me-2"></i> Add New Developer</h5>
+                    <h5 class="modal-title text-dark fw-bold"><i class="fa-solid fa-user-plus text-primary me-2"></i> Add New Staff Member</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
                     <div class="mb-3">
+                        <label class="form-label text-dark small fw-semibold">Staff Department Role <span class="text-danger">*</span></label>
+                        <select class="form-select form-select-chandila" name="role" required>
+                            <option value="developer">Developer (Development Workspace & Progress Logging)</option>
+                            <option value="customer_care">Customer Care (Order Intake, Dev Assignment, Payments & Status)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
                         <label class="form-label text-dark small fw-semibold">Username <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control form-control-chandila" name="username" placeholder="e.g. dev3" required>
+                        <input type="text" class="form-control form-control-chandila" name="username" placeholder="e.g. dev3 or care2" required>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label text-dark small fw-semibold">Full Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control form-control-chandila" name="full_name" placeholder="e.g. Developer 03" required>
+                        <input type="text" class="form-control form-control-chandila" name="full_name" placeholder="e.g. Ruwan Perera" required>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label text-dark small fw-semibold">Email Address <span class="text-danger">*</span></label>
-                        <input type="email" class="form-control form-control-chandila" name="email" placeholder="dev3@chandilaweb.com" required>
+                        <input type="email" class="form-control form-control-chandila" name="email" placeholder="staff@chandilaweb.com" required>
                     </div>
 
                     <div class="mb-3">
@@ -181,8 +196,8 @@ $developers = $pdo->query("
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label text-dark small fw-semibold">Technical Skills</label>
-                        <input type="text" class="form-control form-control-chandila" name="skills" placeholder="e.g. Backend Architecture, PHP 8.2, MySQL, APIs" value="Full Stack Web Development">
+                        <label class="form-label text-dark small fw-semibold">Technical Skills / Role Focus</label>
+                        <input type="text" class="form-control form-control-chandila" name="skills" placeholder="e.g. Full Stack PHP or Customer Relations & Order Intake" value="Full Stack Web Development">
                     </div>
 
                     <div class="mb-3">
@@ -192,7 +207,7 @@ $developers = $pdo->query("
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-electric">Create Developer Account</button>
+                    <button type="submit" class="btn btn-electric">Create Staff Account</button>
                 </div>
             </form>
         </div>

@@ -192,6 +192,8 @@ body.admin-body {
   min-height: 100vh;
   background-color: var(--admin-content-bg);
   padding-top: 70px;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 /* Admin Top Bar (Fixed Header on Desktop & Mobile) */

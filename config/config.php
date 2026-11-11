@@ -62,7 +62,7 @@ if (!defined('BASE_URL')) {
         $scriptDir = '';
     }
 
-    if (strpos($scriptDir, '/admin') !== false || strpos($scriptDir, '/developer') !== false || strpos($scriptDir, '/api') !== false) {
+    if (strpos($scriptDir, '/admin') !== false || strpos($scriptDir, '/developer') !== false || strpos($scriptDir, '/care') !== false || strpos($scriptDir, '/api') !== false) {
         $parentScriptDir = dirname($scriptDir);
         if ($parentScriptDir === '/' || $parentScriptDir === '\\' || $parentScriptDir === '.') {
             $parentScriptDir = '';
