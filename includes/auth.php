@@ -4,6 +4,9 @@
  * Role-Based Access Control, CSRF, Rate Limiting & Session Management
  */
 
+if (!defined('CHANDILA_AUTH_LOADED')) {
+    define('CHANDILA_AUTH_LOADED', true);
+
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../config/database.php';
 
@@ -72,6 +75,18 @@ function getUserName(): string {
     return $_SESSION['user_fullname'] ?? 'User';
 }
 
+function isAdmin(): bool {
+    return getUserRole() === 'admin';
+}
+
+function isDeveloper(): bool {
+    return getUserRole() === 'developer';
+}
+
+function isCustomerCare(): bool {
+    return getUserRole() === 'customer_care';
+}
+
 /**
  * Require Admin Access
  */
@@ -82,6 +97,22 @@ function requireAdmin(): void {
         exit;
     }
     if (getUserRole() !== 'admin') {
+        http_response_code(403);
+        include __DIR__ . '/403.php';
+        exit;
+    }
+}
+
+/**
+ * Require Customer Care Access (allows customer_care and admin)
+ */
+function requireCustomerCare(): void {
+    if (!isLoggedIn()) {
+        $_SESSION['error_flash'] = "Please log in to access the Customer Care Portal.";
+        header("Location: " . BASE_URL . "/login.php?redirect=" . urlencode($_SERVER['REQUEST_URI']));
+        exit;
+    }
+    if (getUserRole() !== 'customer_care' && getUserRole() !== 'admin') {
         http_response_code(403);
         include __DIR__ . '/403.php';
         exit;
@@ -223,4 +254,6 @@ function logoutUser(): void {
     }
     session_destroy();
 }
+}
+
 

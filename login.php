@@ -17,6 +17,9 @@ if (isLoggedIn()) {
     if ($role === 'admin') {
         header("Location: " . BASE_URL . "/admin/index.php");
         exit;
+    } elseif ($role === 'customer_care') {
+        header("Location: " . BASE_URL . "/care/index.php");
+        exit;
     } elseif ($role === 'developer') {
         header("Location: " . BASE_URL . "/developer/index.php");
         exit;
@@ -46,6 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 if ($role === 'admin') {
                     header("Location: " . BASE_URL . "/admin/index.php");
                     exit;
+                } elseif ($role === 'customer_care') {
+                    header("Location: " . BASE_URL . "/care/index.php");
+                    exit;
                 } else {
                     header("Location: " . BASE_URL . "/developer/index.php");
                     exit;
@@ -73,7 +79,7 @@ require_once __DIR__ . '/includes/header.php';
                             <img src="<?php echo BASE_URL; ?>/assets/images/logo.png" alt="Chandila Web Development" class="img-fluid" style="max-height: 52px; object-fit: contain;">
                         </a>
                         <h4 class="text-dark fw-bold mb-1">Staff Portal Login</h4>
-                        <p class="text-muted small mb-0">Authorized administration and developer access</p>
+                        <p class="text-muted small mb-0">Authorized administration, customer care & developer access</p>
                     </div>
 
                     <?php if (!empty($errorMessage)): ?>
@@ -94,7 +100,7 @@ require_once __DIR__ . '/includes/header.php';
                             <label for="username_or_email" class="form-label text-dark small fw-semibold">Username or Email</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light border text-muted"><i class="fa-solid fa-user"></i></span>
-                                <input type="text" class="form-control form-control-chandila" id="username_or_email" name="username_or_email" placeholder="e.g. admin or dev1" required autofocus>
+                                <input type="text" class="form-control form-control-chandila" id="username_or_email" name="username_or_email" placeholder="e.g. admin, care, or dev1" required autofocus>
                             </div>
                         </div>
 

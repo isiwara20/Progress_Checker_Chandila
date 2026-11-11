@@ -7,20 +7,30 @@ document.addEventListener('DOMContentLoaded', function () {
     // 0. Maintain Sidebar Scroll Position Seamlessly Across Page Transitions
     const adminSidebar = document.querySelector('.admin-sidebar');
     if (adminSidebar) {
-        const savedScroll = sessionStorage.getItem('chandila_admin_sidebar_scroll');
-        if (savedScroll !== null) {
+        const storageKey = 'chandila_admin_sidebar_scroll';
+        const savedScroll = sessionStorage.getItem(storageKey);
+        if (savedScroll !== null && savedScroll !== '' && !isNaN(savedScroll)) {
             adminSidebar.scrollTop = parseInt(savedScroll, 10);
+        } else {
+            const activeLink = adminSidebar.querySelector('.admin-menu-link.active');
+            if (activeLink) {
+                activeLink.scrollIntoView({ block: 'center', behavior: 'instant' });
+            }
         }
 
-        // Save position as user scrolls the sidebar
+        // Save position as user scrolls the sidebar (debounced to prevent layout reset overwrites)
+        let scrollTimer = null;
         adminSidebar.addEventListener('scroll', function () {
-            sessionStorage.setItem('chandila_admin_sidebar_scroll', adminSidebar.scrollTop);
+            clearTimeout(scrollTimer);
+            scrollTimer = setTimeout(function() {
+                sessionStorage.setItem(storageKey, adminSidebar.scrollTop);
+            }, 40);
         }, { passive: true });
 
         // Also capture exact scroll position before following any navigation link
         adminSidebar.querySelectorAll('.admin-menu-link').forEach(link => {
             link.addEventListener('click', function () {
-                sessionStorage.setItem('chandila_admin_sidebar_scroll', adminSidebar.scrollTop);
+                sessionStorage.setItem(storageKey, adminSidebar.scrollTop);
             });
         });
     }

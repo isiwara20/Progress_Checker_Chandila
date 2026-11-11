@@ -34,7 +34,7 @@ if ($pdo) {
         $awaitingAdvanceCount = (int)$pdo->query("SELECT COUNT(*) FROM projects WHERE status = 'Advance Payment Pending'")->fetchColumn();
 
         // 4. Active Projects (in development / review)
-        $activeProjectsCount = (int)$pdo->query("SELECT COUNT(*) FROM projects WHERE status IN ('Development Started', 'Development in Progress', 'Client Review / Revisions', 'Hosting & Deployment')")->fetchColumn();
+        $activeProjectsCount = (int)$pdo->query("SELECT COUNT(*) FROM projects WHERE status IN ('Development Started', 'Development in Progress', 'Second Payment Pending', 'Client Review / Revisions', 'Hosting & Deployment')")->fetchColumn();
 
         // 5. Completed & Delivered Projects
         $completedProjectsCount = (int)$pdo->query("SELECT COUNT(*) FROM projects WHERE status IN ('Project Completed', 'Project Delivered')")->fetchColumn();
@@ -89,7 +89,7 @@ if ($pdo) {
             SELECT u.full_name, COUNT(p.id) as active_count
             FROM users u
             LEFT JOIN projects p ON u.id = p.assigned_developer_id 
-                 AND p.status IN ('Development Started', 'Development in Progress', 'Client Review / Revisions')
+                 AND p.status IN ('Development Started', 'Development in Progress', 'Second Payment Pending', 'Client Review / Revisions')
             WHERE u.role = 'developer' AND u.status = 'active'
             GROUP BY u.id
         ");

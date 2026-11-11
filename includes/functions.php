@@ -3,6 +3,9 @@
  * Chandila Web Development – Reusable Business Logic Functions
  */
 
+if (!defined('CHANDILA_FUNCTIONS_LOADED')) {
+    define('CHANDILA_FUNCTIONS_LOADED', true);
+
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../config/database.php';
 
@@ -115,6 +118,15 @@ function formatDateOnly(?string $date): string {
 }
 
 /**
+ * Format Date helper / alias for formatDateTime
+ */
+if (!function_exists('formatDate')) {
+    function formatDate(?string $date, string $format = 'M d, Y h:i A'): string {
+        return formatDateTime($date, $format);
+    }
+}
+
+/**
  * Get modern status badge HTML
  */
 function getStatusBadge(string $status): string {
@@ -126,6 +138,7 @@ function getStatusBadge(string $status): string {
         'Advance Payment Confirmed'  => ['bg' => 'success',   'icon' => 'fa-money-bill-wave'],
         'Development Started'        => ['bg' => 'primary',   'icon' => 'fa-code-branch'],
         'Development in Progress'    => ['bg' => 'info',      'icon' => 'fa-code'],
+        'Second Payment Pending'     => ['bg' => 'warning',   'icon' => 'fa-file-invoice-dollar'],
         'Client Review / Revisions'  => ['bg' => 'warning',   'icon' => 'fa-comments'],
         'Final Payment Pending'      => ['bg' => 'danger',    'icon' => 'fa-wallet'],
         'Hosting & Deployment'       => ['bg' => 'info',      'icon' => 'fa-server fa-bounce'],
@@ -302,4 +315,6 @@ function renderFlashAlerts(): string {
 
     return $out;
 }
+}
+
 

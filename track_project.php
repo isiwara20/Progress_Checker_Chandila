@@ -201,10 +201,10 @@ if (!empty($jobId)) {
                     <div class="chandila-card h-100">
                         <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom border-secondary border-opacity-15">
                             <h4 class="text-dark mb-0">
-                                <i class="fa-solid fa-list-check text-primary me-2"></i> 12-Stage Development Journey
+                                <i class="fa-solid fa-list-check text-primary me-2"></i> Project Development Journey
                             </h4>
                             <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">
-                                Stage <?php echo getStageStepNumber($project['status']); ?> of 12
+                                Stage <?php echo getStageStepNumber($project['status']); ?> of <?php echo count(PROJECT_STAGES); ?>
                             </span>
                         </div>
 
@@ -250,6 +250,7 @@ if (!empty($jobId)) {
                                                 case 'Advance Payment Confirmed': echo "Advance received. Environment setup initiated."; break;
                                                 case 'Development Started': echo "Core architecture & database modeling started."; break;
                                                 case 'Development in Progress': echo "Sprint modules & frontend development underway."; break;
+                                                case 'Second Payment Pending': echo "50% development milestone reached. Awaiting second milestone payment settlement."; break;
                                                 case 'Client Review / Revisions': echo "Preview environment shared for client feedback."; break;
                                                 case 'Final Payment Pending': echo "Development completed. Awaiting final balance."; break;
                                                 case 'Hosting & Deployment': echo "Deploying files, SSL, database & live DNS."; break;
@@ -301,7 +302,7 @@ if (!empty($jobId)) {
                                 <div class="text-end">
                                     <div class="fw-bold small"><?php echo formatCurrency($project['advance_amount']); ?></div>
                                     <?php if ($project['advance_amount'] > 0 && $project['total_paid'] >= $project['advance_amount']): ?>
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.7rem;"><i class="fa-solid fa-check me-1"></i> Paid</span>
+                                        <a href="<?php echo BASE_URL; ?>/invoice.php?job_id=<?php echo urlencode($project['job_id']); ?>&stage=advance" target="_blank" class="badge bg-success-subtle text-success border border-success-subtle text-decoration-none" style="font-size: 0.7rem;"><i class="fa-solid fa-check me-1"></i> Paid (Receipt)</a>
                                     <?php else: ?>
                                         <span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size: 0.7rem;"><i class="fa-solid fa-clock me-1"></i> Pending</span>
                                     <?php endif; ?>
@@ -317,7 +318,7 @@ if (!empty($jobId)) {
                                 <div class="text-end">
                                     <div class="fw-bold small"><?php echo formatCurrency($project['milestone2_amount']); ?></div>
                                     <?php if ($project['total_paid'] >= ($project['advance_amount'] + $project['milestone2_amount']) && $project['milestone2_amount'] > 0): ?>
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.7rem;"><i class="fa-solid fa-check me-1"></i> Paid</span>
+                                        <a href="<?php echo BASE_URL; ?>/invoice.php?job_id=<?php echo urlencode($project['job_id']); ?>&stage=milestone2" target="_blank" class="badge bg-success-subtle text-success border border-success-subtle text-decoration-none" style="font-size: 0.7rem;"><i class="fa-solid fa-check me-1"></i> Paid (Receipt)</a>
                                     <?php else: ?>
                                         <span class="badge bg-secondary" style="font-size: 0.7rem;"><i class="fa-solid fa-clock me-1"></i> Pending</span>
                                     <?php endif; ?>
@@ -333,13 +334,17 @@ if (!empty($jobId)) {
                                 <div class="text-end">
                                     <div class="fw-bold small"><?php echo formatCurrency($project['final_amount']); ?></div>
                                     <?php if ($project['balance_due'] <= 0 && $project['total_cost'] > 0): ?>
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.7rem;"><i class="fa-solid fa-check me-1"></i> Settled</span>
+                                        <a href="<?php echo BASE_URL; ?>/invoice.php?job_id=<?php echo urlencode($project['job_id']); ?>&stage=final" target="_blank" class="badge bg-success-subtle text-success border border-success-subtle text-decoration-none" style="font-size: 0.7rem;"><i class="fa-solid fa-certificate me-1"></i> Settled (PAID)</a>
                                     <?php else: ?>
                                         <span class="badge bg-secondary" style="font-size: 0.7rem;"><i class="fa-solid fa-lock me-1"></i> Pending</span>
                                     <?php endif; ?>
                                 </div>
                             </div>
                         </div>
+
+                        <a href="<?php echo BASE_URL; ?>/invoice.php?job_id=<?php echo urlencode($project['job_id']); ?>" target="_blank" class="btn btn-electric w-100 fw-bold mt-3">
+                            <i class="fa-solid fa-file-invoice-dollar me-1"></i> View Official Invoices &amp; Receipts
+                        </a>
 
                         <!-- Live Hosting Status if Deployed -->
                         <?php if (!empty($project['hosting_url'])): ?>

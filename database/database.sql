@@ -23,7 +23,7 @@ CREATE TABLE `users` (
   `password_hash` VARCHAR(255) NOT NULL,
   `full_name` VARCHAR(100) NOT NULL,
   `phone` VARCHAR(30) DEFAULT NULL,
-  `role` ENUM('admin', 'developer') NOT NULL DEFAULT 'developer',
+  `role` ENUM('admin', 'developer', 'customer_care') NOT NULL DEFAULT 'developer',
   `skills` VARCHAR(255) DEFAULT 'Full Stack Development',
   `status` ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
   `avatar` VARCHAR(255) DEFAULT NULL,
@@ -90,6 +90,7 @@ CREATE TABLE `projects` (
     'Advance Payment Confirmed',
     'Development Started',
     'Development in Progress',
+    'Second Payment Pending',
     'Client Review / Revisions',
     'Final Payment Pending',
     'Hosting & Deployment',
@@ -239,6 +240,29 @@ CREATE TABLE `whatsapp_notifications` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
+-- Table: email_notifications
+-- --------------------------------------------------------
+DROP TABLE IF EXISTS `email_notifications`;
+CREATE TABLE `email_notifications` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `project_id` INT(11) DEFAULT NULL,
+  `job_id` VARCHAR(30) DEFAULT NULL,
+  `recipient_email` VARCHAR(150) NOT NULL,
+  `recipient_name` VARCHAR(120) DEFAULT NULL,
+  `subject` VARCHAR(255) NOT NULL,
+  `body_html` LONGTEXT NOT NULL,
+  `event_type` VARCHAR(100) NOT NULL,
+  `status` ENUM('Pending', 'Sent', 'Failed') NOT NULL DEFAULT 'Pending',
+  `mail_response` TEXT DEFAULT NULL,
+  `sent_at` DATETIME DEFAULT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  INDEX `idx_email_project` (`project_id`),
+  INDEX `idx_email_job_id` (`job_id`),
+  INDEX `idx_email_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
 -- Table: uploaded_files
 -- --------------------------------------------------------
 DROP TABLE IF EXISTS `uploaded_files`;
@@ -324,15 +348,17 @@ CREATE TABLE `career_applications` (
 -- INITIAL SEED DATA
 -- =======================================================================
 
--- 1. Insert Initial Staff Users: 1 Admin & 2 Developers
+-- 1. Insert Initial Staff Users: 1 Admin, 2 Developers & 1 Customer Care
 -- Passwords:
 -- Admin: Admin@12345
 -- Dev 1: Dev1@12345
 -- Dev 2: Dev2@12345
+-- Customer Care: Care@12345
 INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `full_name`, `phone`, `role`, `skills`, `status`, `created_at`) VALUES
 (1, 'admin', 'admin@chandilaweb.com', '$2y$10$HFi1EpRAXqxRadALqkXyLePXIVxGjbA8a3jQhVSBPWRO6Djji2.HK', 'Chandila Admin', '+94 76 843 3340', 'admin', 'Project Architecture & Operations', 'active', NOW()),
 (2, 'dev1', 'dev1@chandilaweb.com', '$2y$10$a.x.hqxBykWUKhMtaT.7puh.X./fWGJ9eMpuNM2VohfceC.L5XWdO', 'Developer 01', '+94 71 234 5678', 'developer', 'Full Stack PHP, MySQL, REST APIs, Laravel', 'active', NOW()),
-(3, 'dev2', 'dev2@chandilaweb.com', '$2y$10$F.66vsE59xnBog70LBTH2OzwnXRGYY/dmyOo.Xe3dvFWCJ9.NoIse', 'Developer 02', '+94 76 345 6789', 'developer', 'Frontend UI/UX, Bootstrap 5, Vue.js, Mobile Responsive', 'active', NOW());
+(3, 'dev2', 'dev2@chandilaweb.com', '$2y$10$F.66vsE59xnBog70LBTH2OzwnXRGYY/dmyOo.Xe3dvFWCJ9.NoIse', 'Developer 02', '+94 76 345 6789', 'developer', 'Frontend UI/UX, Bootstrap 5, Vue.js, Mobile Responsive', 'active', NOW()),
+(4, 'care', 'care@chandilaweb.com', '$2y$10$9ASHwK3T29dDJPwNsG/mluY2/pK7y6sJnLRQ9Rq/EzFtI7UtEKBuW', 'Chandila Customer Care', '+94 76 843 3340', 'customer_care', 'Customer Relations, Order Intake & Project Allocation', 'active', NOW());
 
 -- 2. Insert System Settings
 INSERT INTO `system_settings` (`setting_key`, `setting_value`, `setting_group`) VALUES
@@ -351,7 +377,28 @@ INSERT INTO `system_settings` (`setting_key`, `setting_value`, `setting_group`) 
 ('bank_name', 'Commercial Bank of Ceylon', 'payment'),
 ('bank_account_name', 'Chandila Web Development (Pvt) Ltd', 'payment'),
 ('bank_account_number', '800123456789', 'payment'),
-('bank_branch', 'Colombo 03 Branch', 'payment');
+('bank_branch', 'Colombo 03 Branch', 'payment'),
+('email_provider', 'mail', 'email'),
+('email_sender_name', 'Chandila Web Development', 'email'),
+('email_sender_email', 'contact@chandilaweb.com', 'email'),
+('email_notifications_enabled', '1', 'email'),
+('email_smtp_host', 'mail.chandila.site', 'email'),
+('email_smtp_port', '587', 'email'),
+('email_smtp_user', '', 'email'),
+('email_smtp_pass', '', 'email'),
+('email_smtp_secure', 'tls', 'email'),
+('invoice_company_name', 'Chandila Web Development (Pvt) Ltd', 'invoice'),
+('invoice_tagline', 'Where Innovation Meets Growth', 'invoice'),
+('invoice_address', 'No. 45, Galle Road, Colombo 03, Sri Lanka', 'invoice'),
+('invoice_phone', '076 843 3340', 'invoice'),
+('invoice_email', 'billing@chandilaweb.com', 'invoice'),
+('invoice_tax_number', 'PV-00284729', 'invoice'),
+('invoice_prefix', 'INV-', 'invoice'),
+('invoice_theme_color', '#2563eb', 'invoice'),
+('invoice_paid_stamp_text', 'PAID IN FULL', 'invoice'),
+('invoice_paid_stamp_style', 'classic_red', 'invoice'),
+('invoice_show_watermark', '1', 'invoice'),
+('invoice_footer_notes', 'Thank you for choosing Chandila Web Development. All software code, database structures, and production access rights will be permanently transferred upon complete project settlement. Please retain this official invoice for your accounting records.', 'invoice');
 
 -- 3. Insert Sample Customers
 INSERT INTO `customers` (`id`, `full_name`, `company_name`, `email`, `phone`, `whatsapp_number`, `address`, `created_at`) VALUES

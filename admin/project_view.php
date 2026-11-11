@@ -121,6 +121,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $recipientPhone = $project['whatsapp_number'] ?: $project['customer_phone'];
                 if ($newStatus === 'Development Completed') {
                     WhatsAppService::send($pdo, $recipientPhone, 'Development Completed', ['job_id' => $project['job_id']], $projectId, $project['job_id']);
+                } elseif ($newStatus === 'Second Payment Pending') {
+                    // Send Multi-Channel Notification: 50% Milestone Invoice (WhatsApp & Email)
+                    WhatsAppService::send($pdo, $recipientPhone, 'Second Payment Reminder', [
+                        'job_id'              => $project['job_id'],
+                        'customer_email'      => $project['customer_email'],
+                        'customer_name'       => $project['customer_name'],
+                        'project_title'       => $project['project_title'],
+                        'progress_percentage' => $progressPct,
+                        'latest_update'       => $desc
+                    ], $projectId, $project['job_id'], true);
+
+                    logActivity($pdo, $project['job_id'], $projectId, 'Milestone Invoice Sent', "Admin dispatched 50% Milestone Payment Invoice to client via WhatsApp & Email.", $currentUser['full_name']);
                 } elseif ($notifyWa) {
                     WhatsAppService::send($pdo, $recipientPhone, 'Project Progress Updated', [
                         'job_id'              => $project['job_id'],
@@ -129,7 +141,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     ], $projectId, $project['job_id']);
                 }
 
-                setFlash('success', "Project status updated to '{$newStatus}'.");
+                if ($newStatus === 'Second Payment Pending') {
+                    setFlash('success', "Project status updated to 'Second Payment Pending'. 50% Milestone Payment Invoice dispatched to {$project['customer_name']} via WhatsApp & Email!");
+                } else {
+                    setFlash('success', "Project status updated to '{$newStatus}'.");
+                }
                 header("Location: " . BASE_URL . "/admin/project_view.php?id=" . $projectId);
                 exit;
             }
@@ -170,14 +186,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $newTotalPaid = (float)$calcStmt->fetchColumn();
                 $newBalanceDue = max(0, $project['total_cost'] - $newTotalPaid);
 
-                // Auto update status if advance verified
+                // Auto update status & dispatch multi-channel receipts upon verification
                 $newProjStatus = $project['status'];
-                if ($stage === 'Advance Payment' && $status === 'Payment Received') {
-                    if (in_array($project['status'], ['Request Submitted', 'Request Reviewed', 'Project Confirmed', 'Advance Payment Pending'])) {
-                        $newProjStatus = 'Advance Payment Confirmed';
+                $phone = $project['whatsapp_number'] ?: $project['customer_phone'];
+
+                if ($status === 'Payment Received') {
+                    if ($stage === 'Advance Payment') {
+                        if (in_array($project['status'], ['Request Submitted', 'Request Reviewed', 'Project Confirmed', 'Advance Payment Pending'])) {
+                            $newProjStatus = 'Advance Payment Confirmed';
+                        }
+                        WhatsAppService::send($pdo, $phone, 'Advance Payment Confirmed', [
+                            'job_id' => $project['job_id'],
+                            'invoice_url' => BASE_URL . '/invoice.php?job_id=' . urlencode($project['job_id']) . '&stage=advance'
+                        ], $projectId, $project['job_id']);
+                    } elseif ($stage === 'Second Payment (50% Milestone)') {
+                        WhatsAppService::send($pdo, $phone, 'Second Payment Confirmed', [
+                            'job_id' => $project['job_id'],
+                            'amount_paid' => $amount,
+                            'invoice_url' => BASE_URL . '/invoice.php?job_id=' . urlencode($project['job_id']) . '&stage=milestone2'
+                        ], $projectId, $project['job_id'], true);
+                    } elseif ($stage === 'Final Payment' || $newBalanceDue <= 0) {
+                        WhatsAppService::send($pdo, $phone, 'Final Payment Confirmed', [
+                            'job_id' => $project['job_id'],
+                            'amount_paid' => $amount,
+                            'invoice_url' => BASE_URL . '/invoice.php?job_id=' . urlencode($project['job_id']) . '&stage=final'
+                        ], $projectId, $project['job_id'], true);
                     }
-                    // Send WhatsApp Event 3
-                    WhatsAppService::send($pdo, $project['whatsapp_number'] ?: $project['customer_phone'], 'Advance Payment Confirmed', ['job_id' => $project['job_id']], $projectId, $project['job_id']);
                 }
 
                 $upP = $pdo->prepare("UPDATE projects SET total_paid = ?, balance_due = ?, status = ? WHERE id = ?");
@@ -198,12 +232,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
             if ($reminderType === 'milestone_2') {
                 WhatsAppService::send($pdo, $phone, 'Second Payment Reminder', ['job_id' => $project['job_id']], $projectId, $project['job_id'], true);
-                logActivity($pdo, $project['job_id'], $projectId, 'WhatsApp Reminder', 'Dispatched Second Payment Milestone WhatsApp reminder to customer.', $currentUser['full_name']);
-                setFlash('success', 'Second milestone payment WhatsApp reminder sent!');
+                logActivity($pdo, $project['job_id'], $projectId, 'Payment Reminder', 'Dispatched Second Payment Milestone reminder to customer via WhatsApp & Email.', $currentUser['full_name']);
+                setFlash('success', 'Second milestone payment reminder sent via WhatsApp & Email!');
             } elseif ($reminderType === 'final_payment') {
                 WhatsAppService::send($pdo, $phone, 'Final Payment Reminder', ['job_id' => $project['job_id']], $projectId, $project['job_id'], true);
-                logActivity($pdo, $project['job_id'], $projectId, 'WhatsApp Reminder', 'Dispatched Final Payment WhatsApp reminder to customer.', $currentUser['full_name']);
-                setFlash('success', 'Final payment WhatsApp reminder sent!');
+                logActivity($pdo, $project['job_id'], $projectId, 'Payment Reminder', 'Dispatched Final Payment reminder to customer via WhatsApp & Email.', $currentUser['full_name']);
+                setFlash('success', 'Final payment reminder sent via WhatsApp & Email!');
             }
             header("Location: " . BASE_URL . "/admin/project_view.php?id=" . $projectId);
             exit;
@@ -237,7 +271,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 WhatsAppService::send($pdo, $phone, 'Hosting Completed', ['job_id' => $project['job_id'], 'hosting_url' => $hostingUrl], $projectId, $project['job_id']);
 
                 logActivity($pdo, $project['job_id'], $projectId, 'Hosting Deployed', "Website hosted live at {$hostingUrl}. Status: {$statusToSet}.", $currentUser['full_name']);
-                setFlash('success', "Hosting details saved and WhatsApp notification sent to customer!");
+                setFlash('success', "Hosting details saved and notifications sent to customer via WhatsApp & Email!");
                 header("Location: " . BASE_URL . "/admin/project_view.php?id=" . $projectId);
                 exit;
             }
@@ -308,6 +342,9 @@ require_once __DIR__ . '/../includes/admin_header.php';
         <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#modalRecordPayment">
             <i class="fa-solid fa-money-bill-wave me-1"></i> Record Payment
         </button>
+        <a href="<?php echo BASE_URL; ?>/invoice.php?job_id=<?php echo urlencode($project['job_id']); ?>" target="_blank" class="btn btn-outline-warning btn-sm" title="View &amp; Print Official Invoice">
+            <i class="fa-solid fa-file-invoice-dollar me-1"></i> Official Invoice
+        </a>
         <button type="button" class="btn btn-electric btn-sm" data-bs-toggle="modal" data-bs-target="#modalHostingDeployment">
             <i class="fa-solid fa-server me-1"></i> Hosting & Launch
         </button>
@@ -576,6 +613,10 @@ require_once __DIR__ . '/../includes/admin_header.php';
                     </div>
                 </div>
 
+                <a href="<?php echo BASE_URL; ?>/invoice.php?job_id=<?php echo urlencode($project['job_id']); ?>" target="_blank" class="btn btn-outline-warning w-100 fw-bold mb-3">
+                    <i class="fa-solid fa-file-invoice-dollar me-1"></i> View / Print Official Invoice
+                </a>
+
                 <!-- 3 Stages Breakdown -->
                 <div class="d-flex flex-column gap-2 small">
                     <div class="d-flex justify-content-between align-items-center p-2 rounded bg-light border">
@@ -603,18 +644,18 @@ require_once __DIR__ . '/../includes/admin_header.php';
                     </div>
                 </div>
 
-                <!-- WhatsApp Milestone Reminders -->
+                <!-- WhatsApp & Email Milestone Reminders -->
                 <div class="mt-4 pt-3 border-top border-secondary border-opacity-25">
-                    <span class="text-secondary small fw-semibold text-uppercase d-block mb-2">Automated WhatsApp Reminders:</span>
+                    <span class="text-secondary small fw-semibold text-uppercase d-block mb-2">Customer Payment Reminders (WhatsApp &amp; Email):</span>
                     <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>?id=<?php echo $projectId; ?>" method="POST" class="d-flex flex-column gap-2">
                         <?php echo csrfField(); ?>
                         <input type="hidden" name="action" value="send_whatsapp_reminder">
 
                         <button type="submit" name="reminder_type" value="milestone_2" class="btn btn-sm btn-outline-warning text-start">
-                            <i class="fa-brands fa-whatsapp text-success me-1"></i> Send Second Milestone (50%) Reminder
+                            <i class="fa-brands fa-whatsapp text-success me-1"></i><i class="fa-solid fa-envelope text-primary me-1"></i> Send 50% Milestone Reminder (WhatsApp &amp; Email)
                         </button>
                         <button type="submit" name="reminder_type" value="final_payment" class="btn btn-sm btn-outline-danger text-start">
-                            <i class="fa-brands fa-whatsapp text-success me-1"></i> Send Final Payment Reminder
+                            <i class="fa-brands fa-whatsapp text-success me-1"></i><i class="fa-solid fa-envelope text-primary me-1"></i> Send Final Balance Reminder (WhatsApp &amp; Email)
                         </button>
                     </form>
                 </div>
@@ -688,7 +729,7 @@ require_once __DIR__ . '/../includes/admin_header.php';
                 <div class="modal-body p-4">
                     <div class="mb-3">
                         <label class="form-label text-dark small fw-semibold">Select 12-Stage Status <span class="text-danger">*</span></label>
-                        <select class="form-select form-select-chandila" name="status" required>
+                        <select class="form-select form-select-chandila" name="status" id="adminStatusSelect" required>
                             <?php foreach (PROJECT_STAGES as $stage): ?>
                                 <option value="<?php echo htmlspecialchars($stage); ?>" <?php echo ($project['status'] === $stage) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($stage); ?>
@@ -696,28 +737,34 @@ require_once __DIR__ . '/../includes/admin_header.php';
                             <?php endforeach; ?>
                             <option value="Cancelled" <?php echo ($project['status'] === 'Cancelled') ? 'selected' : ''; ?>>Cancelled</option>
                         </select>
+                        <div id="adminMilestoneNotice" class="alert alert-warning border-warning d-flex align-items-center gap-2 py-2 px-3 small mt-2 <?php echo ($project['status'] === 'Second Payment Pending') ? '' : 'd-none'; ?>">
+                            <i class="fa-solid fa-file-invoice-dollar fs-5 text-warning flex-shrink-0"></i>
+                            <div>
+                                <strong>50% Milestone Invoice Notice:</strong> Saving this stage will automatically generate and send a <strong>Second Payment Invoice</strong> to the client via <strong>WhatsApp &amp; Email</strong> with bank deposit details.
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label text-dark small fw-semibold">Progress Percentage (0 - 100%)</label>
-                        <input type="number" min="0" max="100" class="form-control form-control-chandila" name="progress_percentage" value="<?php echo (int)$project['progress_percentage']; ?>" required>
+                        <input type="number" min="0" max="100" class="form-control form-control-chandila" name="progress_percentage" id="adminProgressInput" value="<?php echo (int)$project['progress_percentage']; ?>" required>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label text-dark small fw-semibold">Public Progress Update Note</label>
-                        <textarea class="form-control form-control-chandila" name="status_note" rows="3" placeholder="e.g. 60% – Shopping cart module completed and tested with live inventory..."></textarea>
+                        <textarea class="form-control form-control-chandila" name="status_note" id="adminStatusNote" rows="3" placeholder="e.g. 50% – Core modules constructed and staged. Second milestone payment invoice dispatched."></textarea>
                     </div>
 
                     <div class="form-check mt-3">
                         <input class="form-check-input" type="checkbox" name="notify_whatsapp" value="1" id="notifyWaCheck" checked>
                         <label class="form-check-label text-dark small fw-bold" for="notifyWaCheck">
-                            <i class="fa-brands fa-whatsapp text-success me-1"></i> Send WhatsApp update to customer immediately
+                            <i class="fa-brands fa-whatsapp text-success me-1"></i><i class="fa-solid fa-envelope text-primary me-1"></i> Send WhatsApp &amp; Email update to customer immediately
                         </label>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-electric">Save Status & Send WhatsApp</button>
+                    <button type="submit" class="btn btn-electric">Save Status &amp; Notify Customer</button>
                 </div>
             </form>
         </div>
@@ -888,6 +935,52 @@ require_once __DIR__ . '/../includes/admin_header.php';
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const adminStatusSelect = document.getElementById('adminStatusSelect');
+    const adminProgressInput = document.getElementById('adminProgressInput');
+    const adminStatusNote = document.getElementById('adminStatusNote');
+    const adminMilestoneNotice = document.getElementById('adminMilestoneNotice');
+
+    const adminStageMap = {
+        'Request Submitted': { pct: 0, note: 'Requirement received with official Job ID.' },
+        'Request Reviewed': { pct: 5, note: 'Scope analyzed and payment schedule agreed.' },
+        'Project Confirmed': { pct: 10, note: 'Project approved for development queue.' },
+        'Advance Payment Pending': { pct: 10, note: 'Awaiting advance payment verification.' },
+        'Advance Payment Confirmed': { pct: 15, note: 'Advance received. Environment setup initiated.' },
+        'Development Started': { pct: 20, note: 'Core architecture & database modeling started.' },
+        'Development in Progress': { pct: 40, note: 'Sprint modules & frontend development underway.' },
+        'Second Payment Pending': { pct: 50, note: '50% Development Milestone Reached: Core modules constructed. Second milestone payment invoice dispatched.' },
+        'Client Review / Revisions': { pct: 75, note: 'Preview environment shared for client feedback.' },
+        'Final Payment Pending': { pct: 90, note: 'Development completed. Awaiting final balance.' },
+        'Hosting & Deployment': { pct: 95, note: 'Deploying files, SSL, database & live DNS.' },
+        'Project Completed': { pct: 100, note: 'Quality assurance and testing verified.' },
+        'Project Delivered': { pct: 100, note: 'Live website handed over to client with credentials.' },
+        'Cancelled': { pct: 0, note: 'Project has been cancelled.' }
+    };
+
+    if (adminStatusSelect && adminProgressInput) {
+        adminStatusSelect.addEventListener('change', function() {
+            const val = adminStatusSelect.value;
+            const item = adminStageMap[val];
+            if (item) {
+                adminProgressInput.value = item.pct;
+                if (adminStatusNote && (!adminStatusNote.value.trim() || Object.values(adminStageMap).some(s => s.note === adminStatusNote.value.trim()))) {
+                    adminStatusNote.value = item.note;
+                }
+            }
+            if (adminMilestoneNotice) {
+                if (val === 'Second Payment Pending') {
+                    adminMilestoneNotice.classList.remove('d-none');
+                } else {
+                    adminMilestoneNotice.classList.add('d-none');
+                }
+            }
+        });
+    }
+});
+</script>
 
 <?php require_once __DIR__ . '/../includes/admin_footer.php'; ?>
 

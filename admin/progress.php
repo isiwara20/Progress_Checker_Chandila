@@ -13,7 +13,7 @@ $projects = $pdo->query("
     FROM projects p
     JOIN customers c ON p.customer_id = c.id
     LEFT JOIN users u ON p.assigned_developer_id = u.id
-    WHERE p.status IN ('Development Started', 'Development in Progress', 'Client Review / Revisions', 'Hosting & Deployment')
+    WHERE p.status IN ('Development Started', 'Development in Progress', 'Second Payment Pending', 'Client Review / Revisions', 'Hosting & Deployment')
     ORDER BY p.expected_completion_date ASC
 ")->fetchAll();
 ?>

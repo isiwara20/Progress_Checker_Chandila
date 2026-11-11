@@ -19,7 +19,7 @@ $devMetrics = $pdo->query("
     SELECT u.full_name,
            COUNT(p.id) as total_handled,
            COUNT(CASE WHEN p.status = 'Project Delivered' THEN 1 END) as delivered_count,
-           COUNT(CASE WHEN p.status IN ('Development Started', 'Development in Progress') THEN 1 END) as active_count,
+           COUNT(CASE WHEN p.status IN ('Development Started', 'Development in Progress', 'Second Payment Pending') THEN 1 END) as active_count,
            COALESCE(SUM(p.total_paid), 0) as generated_revenue
     FROM users u
     LEFT JOIN projects p ON u.id = p.assigned_developer_id

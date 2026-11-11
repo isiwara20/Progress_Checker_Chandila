@@ -39,16 +39,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $newTotalPaid = (float)$calcStmt->fetchColumn();
                 $newBalanceDue = max(0, $payment['total_cost'] - $newTotalPaid);
 
-                // If Advance payment is confirmed, update status to Advance Payment Confirmed & Development Started
-                $newProjStatus = $payment['proj_status'];
-                if ($payment['payment_stage'] === 'Advance Payment' && $newStatus === 'Payment Received') {
-                    if (in_array($payment['proj_status'], ['Request Submitted', 'Request Reviewed', 'Project Confirmed', 'Advance Payment Pending'])) {
-                        $newProjStatus = 'Advance Payment Confirmed';
-                    }
+                // Multi-Stage Customer Notification Dispatches
+                $custPhone = $pdo->query("SELECT COALESCE(whatsapp_number, phone) FROM customers WHERE id = {$payment['customer_id']}")->fetchColumn();
 
-                    // Get customer phone
-                    $custPhone = $pdo->query("SELECT COALESCE(whatsapp_number, phone) FROM customers WHERE id = {$payment['customer_id']}")->fetchColumn();
-                    WhatsAppService::send($pdo, $custPhone, 'Advance Payment Confirmed', ['job_id' => $payment['job_id']], $payment['project_id'], $payment['job_id']);
+                $newProjStatus = $payment['proj_status'];
+                if ($newStatus === 'Payment Received') {
+                    if ($payment['payment_stage'] === 'Advance Payment') {
+                        if (in_array($payment['proj_status'], ['Request Submitted', 'Request Reviewed', 'Project Confirmed', 'Advance Payment Pending'])) {
+                            $newProjStatus = 'Advance Payment Confirmed';
+                        }
+                        WhatsAppService::send($pdo, $custPhone, 'Advance Payment Confirmed', [
+                            'job_id' => $payment['job_id'],
+                            'invoice_url' => BASE_URL . '/invoice.php?job_id=' . urlencode($payment['job_id']) . '&stage=advance'
+                        ], $payment['project_id'], $payment['job_id']);
+                    } elseif ($payment['payment_stage'] === 'Second Payment (50% Milestone)') {
+                        WhatsAppService::send($pdo, $custPhone, 'Second Payment Confirmed', [
+                            'job_id' => $payment['job_id'],
+                            'amount_paid' => $payment['amount'],
+                            'invoice_url' => BASE_URL . '/invoice.php?job_id=' . urlencode($payment['job_id']) . '&stage=milestone2'
+                        ], $payment['project_id'], $payment['job_id'], true);
+                    } elseif ($payment['payment_stage'] === 'Final Payment' || $newBalanceDue <= 0) {
+                        WhatsAppService::send($pdo, $custPhone, 'Final Payment Confirmed', [
+                            'job_id' => $payment['job_id'],
+                            'amount_paid' => $payment['amount'],
+                            'invoice_url' => BASE_URL . '/invoice.php?job_id=' . urlencode($payment['job_id']) . '&stage=final'
+                        ], $payment['project_id'], $payment['job_id'], true);
+                    }
                 }
 
                 $pdo->prepare("UPDATE projects SET total_paid = ?, balance_due = ?, status = ? WHERE id = ?")->execute([$newTotalPaid, $newBalanceDue, $newProjStatus, $payment['project_id']]);
@@ -230,6 +246,9 @@ $payments = $stmt->fetchAll();
                                 <?php endif; ?>
                             </td>
                             <td class="text-end text-nowrap">
+                                <a href="<?php echo BASE_URL; ?>/invoice.php?payment_id=<?php echo $pay['id']; ?>" target="_blank" class="btn btn-sm btn-outline-warning py-1 px-2 me-1" title="View Official Invoice &amp; Receipt">
+                                    <i class="fa-solid fa-file-invoice-dollar me-1"></i> Invoice
+                                </a>
                                 <?php if ($pay['status'] === 'Pending'): ?>
                                     <!-- Confirm Payment Button -->
                                     <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST" class="d-inline">

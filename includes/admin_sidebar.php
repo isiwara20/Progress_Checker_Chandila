@@ -119,6 +119,13 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             </a>
         </li>
 
+        <li class="admin-menu-item">
+            <a href="<?php echo BASE_URL; ?>/admin/emails.php" class="admin-menu-link <?php echo ($currentPage === 'emails.php') ? 'active' : ''; ?>">
+                <i class="fa-solid fa-envelope text-primary"></i>
+                <span>Email Log</span>
+            </a>
+        </li>
+
         <!-- 10. Reports -->
         <li class="admin-menu-item">
             <a href="<?php echo BASE_URL; ?>/admin/reports.php" class="admin-menu-link <?php echo ($currentPage === 'reports.php') ? 'active' : ''; ?>">
@@ -155,4 +162,69 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         </div>
     </div>
 </aside>
+
+<!-- Instant Synchronous Sidebar Scroll Position Handler -->
+<script>
+(function() {
+    var sidebar = document.querySelector('.admin-sidebar');
+    if (!sidebar) return;
+
+    var storageKey = 'chandila_admin_sidebar_scroll';
+
+    // 1. Immediate Synchronous Scroll Restoration (Zero Visual Jump)
+    function restoreSidebarPos() {
+        var saved = sessionStorage.getItem(storageKey);
+        if (saved !== null && saved !== '' && !isNaN(saved)) {
+            var target = parseInt(saved, 10);
+            if (sidebar.scrollTop !== target) {
+                sidebar.scrollTop = target;
+            }
+        } else {
+            // If direct visit or no stored position, ensure active menu item is scrolled into view
+            var activeLink = sidebar.querySelector('.admin-menu-link.active');
+            if (activeLink) {
+                var linkRect = activeLink.getBoundingClientRect();
+                var sidebarRect = sidebar.getBoundingClientRect();
+                if (linkRect.top < (sidebarRect.top + 60) || linkRect.bottom > (sidebarRect.bottom - 60)) {
+                    activeLink.scrollIntoView({ block: 'center', behavior: 'instant' });
+                    sessionStorage.setItem(storageKey, sidebar.scrollTop);
+                }
+            }
+        }
+    }
+
+    // Run right now as HTML is parsed
+    restoreSidebarPos();
+
+    // Run again once DOM is ready and when window loads (after web fonts load)
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', restoreSidebarPos);
+    }
+    window.addEventListener('load', restoreSidebarPos);
+
+    // Save position continuously on scroll (debounced)
+    var scrollTimer = null;
+    sidebar.addEventListener('scroll', function() {
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(function() {
+            sessionStorage.setItem(storageKey, sidebar.scrollTop);
+        }, 40);
+    }, { passive: true });
+
+    // Instantly save on any link click
+    sidebar.addEventListener('click', function(e) {
+        var link = e.target.closest('a');
+        if (link) {
+            sessionStorage.setItem(storageKey, sidebar.scrollTop);
+        }
+    });
+
+    // Save on beforeunload
+    window.addEventListener('beforeunload', function() {
+        if (sidebar && sidebar.scrollTop > 0) {
+            sessionStorage.setItem(storageKey, sidebar.scrollTop);
+        }
+    });
+})();
+</script>
 

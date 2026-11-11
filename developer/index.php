@@ -6,7 +6,7 @@ $devId = $currentUser['id'];
 
 // Metrics for logged-in developer
 $totalAssigned = (int)$pdo->query("SELECT COUNT(*) FROM projects WHERE assigned_developer_id = {$devId}")->fetchColumn();
-$ongoingCount = (int)$pdo->query("SELECT COUNT(*) FROM projects WHERE assigned_developer_id = {$devId} AND status IN ('Development Started', 'Development in Progress', 'Client Review / Revisions')")->fetchColumn();
+$ongoingCount = (int)$pdo->query("SELECT COUNT(*) FROM projects WHERE assigned_developer_id = {$devId} AND status IN ('Development Started', 'Development in Progress', 'Second Payment Pending', 'Client Review / Revisions')")->fetchColumn();
 $completedCount = (int)$pdo->query("SELECT COUNT(*) FROM projects WHERE assigned_developer_id = {$devId} AND status IN ('Development Completed', 'Hosting & Deployment', 'Project Completed', 'Project Delivered')")->fetchColumn();
 
 // Pending Tasks / Milestones count

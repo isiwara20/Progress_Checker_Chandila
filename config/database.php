@@ -4,10 +4,14 @@
  * Uses PHP Data Objects (PDO) with Prepared Statements
  */
 
+if (!defined('CHANDILA_DATABASE_LOADED')) {
+    define('CHANDILA_DATABASE_LOADED', true);
+
 require_once __DIR__ . '/config.php';
 
 class Database {
     private static ?PDO $instance = null;
+    private static bool $schemaChecked = false;
 
     public static function getConnection(): ?PDO {
         if (self::$instance === null) {
@@ -36,6 +40,7 @@ class Database {
                         }
                         
                         self::$instance = new PDO($dsn, DB_USER, DB_PASS, $options);
+                        self::ensureSchemaCompatibility(self::$instance);
                         return self::$instance;
                     } catch (Exception $autoEx) {
                         self::renderDbError($autoEx->getMessage());
@@ -45,7 +50,47 @@ class Database {
                 }
             }
         }
+
+        if (self::$instance !== null && !self::$schemaChecked) {
+            self::$schemaChecked = true;
+            self::ensureSchemaCompatibility(self::$instance);
+        }
+
         return self::$instance;
+    }
+
+    /**
+     * Self-healing runtime schema compatibility checks
+     */
+    private static function ensureSchemaCompatibility(PDO $pdo): void {
+        try {
+            // 1. Ensure projects.status supports all stages including 'Second Payment Pending'
+            $pdo->exec("ALTER TABLE projects MODIFY status VARCHAR(100) NOT NULL DEFAULT 'Request Submitted'");
+        } catch (Exception $e) {
+            // Ignore if already compatible or permissions restricted
+        }
+
+        try {
+            // 2. Ensure users.role supports 'customer_care'
+            $pdo->exec("ALTER TABLE users MODIFY role VARCHAR(50) NOT NULL DEFAULT 'developer'");
+        } catch (Exception $e) {
+            // Ignore if already compatible or permissions restricted
+        }
+
+        try {
+            // 3. Ensure a default Customer Care agent account exists
+            $checkStmt = $pdo->query("SELECT id FROM users WHERE role = 'customer_care' LIMIT 1");
+            if (!$checkStmt->fetch()) {
+                $carePass = password_hash('Care@12345', PASSWORD_BCRYPT);
+                $insCare = $pdo->prepare("
+                    INSERT INTO users (username, email, password_hash, full_name, phone, role, skills, status, created_at)
+                    VALUES ('care', 'care@chandilaweb.com', ?, 'Customer Care Desk', '+94 76 843 3340', 'customer_care', 'Customer Relations & Order Intake', 'active', NOW())
+                ");
+                $insCare->execute([$carePass]);
+            }
+        } catch (Exception $e) {
+            // Ignore if already inserted or restricted
+        }
     }
 
     private static function renderDbError(string $message): void {
@@ -105,7 +150,11 @@ class Database {
     }
 }
 
-function getDB(): ?PDO {
-    return Database::getConnection();
+if (!function_exists('getDB')) {
+    function getDB(): ?PDO {
+        return Database::getConnection();
+    }
 }
+}
+
 

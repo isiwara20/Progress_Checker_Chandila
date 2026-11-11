@@ -106,12 +106,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     $fullName
                 );
 
-                // 6. Send Automatic WhatsApp Confirmation (Event 1)
+                // 6. Send Automatic Multi-Channel Confirmation (WhatsApp & Email Event 1)
                 $waResult = WhatsAppService::send(
                     $pdo,
                     $phone,
                     'Project Request Submitted',
-                    ['job_id' => $jobId],
+                    [
+                        'job_id'         => $jobId,
+                        'customer_name'  => $fullName,
+                        'customer_email' => $email,
+                        'project_title'  => $projectTitle,
+                        'project_type'   => $projectType,
+                        'expected_budget'=> $expectedBudget
+                    ],
                     $projectId,
                     $jobId
                 );

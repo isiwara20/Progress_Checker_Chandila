@@ -69,11 +69,16 @@ body.admin-body {
 }
 
 .admin-sidebar-brand {
-  padding: 20px 20px;
+  padding: 18px 20px;
   border-bottom: 1px solid var(--admin-border);
   display: flex;
   align-items: center;
   justify-content: center;
+  position: sticky;
+  top: 0;
+  background-color: var(--admin-sidebar-bg);
+  z-index: 10;
+  flex-shrink: 0;
 }
 
 .admin-logo-img {
@@ -153,12 +158,16 @@ body.admin-body {
 
 /* User footer in sidebar */
 .admin-sidebar-footer {
-  padding: 16px 20px;
+  padding: 14px 20px;
   border-top: 1px solid var(--admin-border);
   display: flex;
   align-items: center;
   gap: 12px;
   background: #f8fafc;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  flex-shrink: 0;
 }
 
 .user-avatar-circle {

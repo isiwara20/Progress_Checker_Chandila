@@ -87,6 +87,20 @@ $totalFailed = (int)$pdo->query("SELECT COUNT(*) FROM whatsapp_notifications WHE
 $totalPending = (int)$pdo->query("SELECT COUNT(*) FROM whatsapp_notifications WHERE status = 'Pending'")->fetchColumn();
 ?>
 
+<!-- Multi-Channel Navigation Tabs -->
+<ul class="nav nav-pills mb-4">
+    <li class="nav-item">
+        <a class="nav-link active bg-success text-white" href="<?php echo BASE_URL; ?>/admin/whatsapp.php">
+            <i class="fa-brands fa-whatsapp me-2"></i> WhatsApp Notifications
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link text-secondary" href="<?php echo BASE_URL; ?>/admin/emails.php">
+            <i class="fa-solid fa-envelope me-2"></i> Customer Email Notifications
+        </a>
+    </li>
+</ul>
+
 <!-- Header & Active Provider Banner -->
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
     <div>

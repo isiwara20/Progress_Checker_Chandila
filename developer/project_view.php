@@ -61,8 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $internalNote= trim($_POST['internal_note'] ?? '');
             $notifyWa    = !empty($_POST['notify_whatsapp']);
 
-            // Allowed statuses for developer
-            $allowedDevStatuses = ['Development Started', 'Development in Progress', 'Client Review / Revisions', 'Development Completed'];
+            // Allowed statuses for developer (includes 50% milestone: Second Payment Pending)
+            $allowedDevStatuses = ['Development Started', 'Development in Progress', 'Second Payment Pending', 'Client Review / Revisions', 'Development Completed'];
             if (!in_array($newStatus, $allowedDevStatuses, true)) {
                 $newStatus = 'Development in Progress';
             }
@@ -89,21 +89,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 // Log Activity
                 logActivity($pdo, $project['job_id'], $projectId, 'Progress Updated', "Developer {$currentUser['full_name']} updated progress to {$progressPct}% ({$newStatus}).", $currentUser['full_name']);
 
-                // WhatsApp Notification Triggers
+                // WhatsApp & Email Multi-Channel Notification Triggers
                 $phone = $project['whatsapp_number'] ?: $project['customer_phone'];
                 if ($newStatus === 'Development Completed') {
-                    // Send WhatsApp Event 7: Development Completed
-                    WhatsAppService::send($pdo, $phone, 'Development Completed', ['job_id' => $project['job_id']], $projectId, $project['job_id']);
+                    // Send Multi-Channel Notification: Development Completed (WhatsApp & Email)
+                    WhatsAppService::send($pdo, $phone, 'Development Completed', [
+                        'job_id'         => $project['job_id'],
+                        'customer_email' => $project['customer_email'],
+                        'customer_name'  => $project['customer_name']
+                    ], $projectId, $project['job_id']);
+                } elseif ($newStatus === 'Second Payment Pending') {
+                    // Send Multi-Channel Notification: 50% Milestone Invoice (WhatsApp & Email)
+                    WhatsAppService::send($pdo, $phone, 'Second Payment Reminder', [
+                        'job_id'              => $project['job_id'],
+                        'customer_email'      => $project['customer_email'],
+                        'customer_name'       => $project['customer_name'],
+                        'project_title'       => $project['project_title'],
+                        'progress_percentage' => $progressPct,
+                        'latest_update'       => $desc
+                    ], $projectId, $project['job_id'], true);
+
+                    logActivity($pdo, $project['job_id'], $projectId, 'Milestone Invoice Sent', "Dispatched 50% Milestone Payment Invoice to client via WhatsApp & Email.", $currentUser['full_name']);
                 } elseif ($notifyWa) {
-                    // Send WhatsApp Event 5: Project Progress Updated
+                    // Send Multi-Channel Notification: Project Progress Updated (WhatsApp & Email)
                     WhatsAppService::send($pdo, $phone, 'Project Progress Updated', [
                         'job_id'              => $project['job_id'],
+                        'customer_email'      => $project['customer_email'],
+                        'customer_name'       => $project['customer_name'],
                         'progress_percentage' => $progressPct,
                         'latest_update'       => $desc
                     ], $projectId, $project['job_id']);
                 }
 
-                setFlash('success', "Progress updated to {$progressPct}% successfully!");
+                if ($newStatus === 'Second Payment Pending') {
+                    setFlash('success', "Progress updated to {$progressPct}% (Second Payment Pending). 50% Milestone Payment Invoice sent to {$project['customer_name']} via WhatsApp & Email!");
+                } else {
+                    setFlash('success', "Progress updated to {$progressPct}% successfully!");
+                }
                 header("Location: " . BASE_URL . "/developer/project_view.php?id=" . $projectId);
                 exit;
             }
@@ -324,24 +346,32 @@ require_once __DIR__ . '/../includes/dev_header.php';
                     <div class="mb-3">
                         <label class="form-label text-dark small fw-semibold">Progress Percentage (0% – 100%) <span class="text-danger">*</span></label>
                         <div class="input-group">
-                            <input type="number" min="0" max="100" class="form-control form-control-chandila" name="progress_percentage" value="<?php echo (int)$project['progress_percentage']; ?>" required>
+                            <input type="number" min="0" max="100" class="form-control form-control-chandila" name="progress_percentage" id="devProgressInput" value="<?php echo (int)$project['progress_percentage']; ?>" required>
                             <span class="input-group-text bg-light border text-primary fw-bold">%</span>
                         </div>
+                        <div class="form-text text-secondary small">Auto-adjusts with stage changes; developers can also type custom values.</div>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label text-dark small fw-semibold">Development Status Stage <span class="text-danger">*</span></label>
-                        <select class="form-select form-select-chandila" name="status" required>
-                            <option value="Development Started" <?php echo ($project['status'] === 'Development Started') ? 'selected' : ''; ?>>Development Started</option>
-                            <option value="Development in Progress" <?php echo ($project['status'] === 'Development in Progress') ? 'selected' : ''; ?>>Development in Progress</option>
-                            <option value="Client Review / Revisions" <?php echo ($project['status'] === 'Client Review / Revisions') ? 'selected' : ''; ?>>Client Review / Revisions</option>
-                            <option value="Development Completed" <?php echo ($project['status'] === 'Development Completed') ? 'selected' : ''; ?>>Development Completed (Ready for Final Review)</option>
+                        <select class="form-select form-select-chandila" name="status" id="devStatusSelect" required>
+                            <option value="Development Started" <?php echo ($project['status'] === 'Development Started') ? 'selected' : ''; ?>>Development Started (20%)</option>
+                            <option value="Development in Progress" <?php echo ($project['status'] === 'Development in Progress') ? 'selected' : ''; ?>>Development in Progress (40%)</option>
+                            <option value="Second Payment Pending" <?php echo ($project['status'] === 'Second Payment Pending') ? 'selected' : ''; ?>>Second Payment Pending (50% Milestone Reached)</option>
+                            <option value="Client Review / Revisions" <?php echo ($project['status'] === 'Client Review / Revisions') ? 'selected' : ''; ?>>Client Review / Revisions (75%)</option>
+                            <option value="Development Completed" <?php echo ($project['status'] === 'Development Completed') ? 'selected' : ''; ?>>Development Completed (100% - Ready for Final Review)</option>
                         </select>
+                        <div id="devMilestoneNotice" class="alert alert-warning border-warning d-flex align-items-center gap-2 py-2 px-3 small mt-2 <?php echo ($project['status'] === 'Second Payment Pending' || (int)$project['progress_percentage'] === 50) ? '' : 'd-none'; ?>">
+                            <i class="fa-solid fa-file-invoice-dollar fs-5 text-warning flex-shrink-0"></i>
+                            <div>
+                                <strong>50% Milestone Invoice Notice:</strong> Saving this stage will automatically generate and send a <strong>Second Payment Invoice</strong> to the client via <strong>WhatsApp &amp; Email</strong> with bank deposit details.
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label text-dark small fw-semibold">Public Progress Description <span class="text-danger">*</span></label>
-                        <textarea class="form-control form-control-chandila" name="progress_description" rows="3" placeholder="e.g. 40% – Frontend responsive layouts completed. Integrated product catalog UI." required></textarea>
+                        <textarea class="form-control form-control-chandila" name="progress_description" id="devProgressDesc" rows="3" placeholder="e.g. 50% – Core application modules constructed and staged. Second milestone payment invoice dispatched." required></textarea>
                         <div class="form-text text-secondary small">This description is shown on the customer's live tracking timeline.</div>
                     </div>
 
@@ -354,7 +384,7 @@ require_once __DIR__ . '/../includes/dev_header.php';
                     <div class="form-check mb-4">
                         <input class="form-check-input" type="checkbox" name="notify_whatsapp" value="1" id="notifyDevWaCheck" checked>
                         <label class="form-check-label text-dark small fw-bold" for="notifyDevWaCheck">
-                            <i class="fa-brands fa-whatsapp text-success me-1"></i> Send WhatsApp update to customer now
+                            <i class="fa-brands fa-whatsapp text-success me-1"></i><i class="fa-solid fa-envelope text-primary me-1"></i> Send WhatsApp &amp; Email update to customer now
                         </label>
                     </div>
 
@@ -435,6 +465,86 @@ require_once __DIR__ . '/../includes/dev_header.php';
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const statusSelect = document.getElementById('devStatusSelect');
+    const progressInput = document.getElementById('devProgressInput');
+    const progressDesc = document.getElementById('devProgressDesc');
+    const milestoneNotice = document.getElementById('devMilestoneNotice');
+
+    const stageDefaults = {
+        'Development Started': {
+            pct: 20,
+            desc: 'Development started: Core database schema, backend architecture, and project repository initialized.'
+        },
+        'Development in Progress': {
+            pct: 40,
+            desc: 'Development in progress: Frontend UI components, page templates, and primary business logic being actively coded.'
+        },
+        'Second Payment Pending': {
+            pct: 50,
+            desc: '50% Development Milestone Reached: Core application modules constructed and staged. Second payment (50% milestone) invoice dispatched.'
+        },
+        'Client Review / Revisions': {
+            pct: 75,
+            desc: 'Client review and revisions stage: Staging build ready for client walkthrough, testing, and feedback incorporation.'
+        },
+        'Development Completed': {
+            pct: 100,
+            desc: 'Core development completed 100%: All modules implemented, tested, and ready for final client sign-off and deployment.'
+        }
+    };
+
+    function updateFromStatus(forceDesc = false) {
+        if (!statusSelect || !progressInput) return;
+        const val = statusSelect.value;
+        const config = stageDefaults[val];
+
+        if (config) {
+            progressInput.value = config.pct;
+            if (progressDesc) {
+                const currentText = progressDesc.value.trim();
+                const isMatchingAnyPreset = Object.values(stageDefaults).some(s => s.desc === currentText);
+                if (!currentText || isMatchingAnyPreset || forceDesc) {
+                    progressDesc.value = config.desc;
+                }
+            }
+        }
+
+        // Toggle 50% milestone notice banner
+        if (milestoneNotice) {
+            if (val === 'Second Payment Pending' || parseInt(progressInput.value) === 50) {
+                milestoneNotice.classList.remove('d-none');
+            } else {
+                milestoneNotice.classList.add('d-none');
+            }
+        }
+    }
+
+    if (statusSelect) {
+        statusSelect.addEventListener('change', function() {
+            updateFromStatus(false);
+        });
+    }
+
+    if (progressInput) {
+        progressInput.addEventListener('input', function() {
+            const num = parseInt(progressInput.value, 10);
+            if (num === 50 && statusSelect.value !== 'Second Payment Pending') {
+                statusSelect.value = 'Second Payment Pending';
+                updateFromStatus(false);
+            } else if (milestoneNotice) {
+                if (statusSelect.value === 'Second Payment Pending' || num === 50) {
+                    milestoneNotice.classList.remove('d-none');
+                } else {
+                    milestoneNotice.classList.add('d-none');
+                }
+            }
+        });
+    }
+});
+</script>
 
 <?php require_once __DIR__ . '/../includes/dev_footer.php'; ?>
 

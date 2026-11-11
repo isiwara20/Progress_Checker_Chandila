@@ -64,7 +64,7 @@ require_once __DIR__ . '/../includes/admin_header.php';
 $developers = $pdo->query("
     SELECT u.*,
            COUNT(p.id) AS total_assigned,
-           COUNT(CASE WHEN p.status IN ('Development Started', 'Development in Progress', 'Client Review / Revisions') THEN 1 END) AS ongoing_count,
+           COUNT(CASE WHEN p.status IN ('Development Started', 'Development in Progress', 'Second Payment Pending', 'Client Review / Revisions') THEN 1 END) AS ongoing_count,
            COUNT(CASE WHEN p.status IN ('Project Completed', 'Project Delivered') THEN 1 END) AS completed_count
     FROM users u
     LEFT JOIN projects p ON u.id = p.assigned_developer_id

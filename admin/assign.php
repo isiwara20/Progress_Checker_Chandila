@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     // Send WhatsApp Event 4: Project Assigned
                     WhatsAppService::send($pdo, $proj['whatsapp_number'] ?: $proj['phone'], 'Project Assigned', ['job_id' => $proj['job_id']], $projectId, $proj['job_id']);
 
-                    setFlash('success', "Project {$proj['job_id']} assigned to {$devName} and customer notified via WhatsApp!");
+                    setFlash('success', "Project {$proj['job_id']} assigned to {$devName} and customer notified via WhatsApp & Email!");
                 } else {
                     logActivity($pdo, $proj['job_id'], $projectId, 'Developer Unassigned', "Project developer unassigned.", $currentUser['full_name']);
                     setFlash('info', "Project {$proj['job_id']} is now unassigned.");
@@ -53,7 +53,7 @@ require_once __DIR__ . '/../includes/admin_header.php';
 // Fetch Developers with their current ongoing count
 $developers = $pdo->query("
     SELECT u.*, 
-           COUNT(CASE WHEN p.status IN ('Development Started', 'Development in Progress', 'Client Review / Revisions') THEN 1 END) AS ongoing_count
+           COUNT(CASE WHEN p.status IN ('Development Started', 'Development in Progress', 'Second Payment Pending', 'Client Review / Revisions') THEN 1 END) AS ongoing_count
     FROM users u
     LEFT JOIN projects p ON u.id = p.assigned_developer_id
     WHERE u.role = 'developer' AND u.status = 'active'
