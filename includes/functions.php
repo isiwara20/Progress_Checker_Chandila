@@ -315,6 +315,22 @@ function renderFlashAlerts(): string {
 
     return $out;
 }
+
+/**
+ * Safe HTTP Redirect Helper
+ * Performs header redirect with fallback for environments where output has begun
+ */
+if (!function_exists('redirect')) {
+    function redirect(string $url): void {
+        if (!headers_sent()) {
+            header("Location: {$url}");
+            exit;
+        }
+        echo "<script>window.location.href=" . json_encode($url) . ";</script>";
+        echo "<noscript><meta http-equiv=\"refresh\" content=\"0;url=" . htmlspecialchars($url) . "\"></noscript>";
+        exit;
+    }
+}
 }
 
 

@@ -91,6 +91,55 @@ class Database {
         } catch (Exception $e) {
             // Ignore if already inserted or restricted
         }
+
+        try {
+            // 4. Ensure care_working_hours table exists
+            $pdo->exec("
+                CREATE TABLE IF NOT EXISTS `care_working_hours` (
+                    `id` INT(11) NOT NULL AUTO_INCREMENT,
+                    `user_id` INT(11) NOT NULL,
+                    `work_date` DATE NOT NULL,
+                    `shift_type` VARCHAR(100) NOT NULL DEFAULT 'Standard Full Day',
+                    `start_time` DATETIME NOT NULL,
+                    `end_time` DATETIME DEFAULT NULL,
+                    `total_hours` DECIMAL(5,2) DEFAULT NULL,
+                    `status` ENUM('In Progress', 'Completed', 'Approved') NOT NULL DEFAULT 'In Progress',
+                    `tasks_summary` TEXT DEFAULT NULL,
+                    `notes` TEXT DEFAULT NULL,
+                    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                    PRIMARY KEY (`id`),
+                    INDEX `idx_care_user` (`user_id`),
+                    INDEX `idx_care_date` (`work_date`),
+                    INDEX `idx_care_status` (`status`),
+                    CONSTRAINT `fk_care_hours_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+            ");
+        } catch (Exception $e) {
+            // Fallback without foreign key in case user table is MyISAM or constrained
+            try {
+                $pdo->exec("
+                    CREATE TABLE IF NOT EXISTS `care_working_hours` (
+                        `id` INT(11) NOT NULL AUTO_INCREMENT,
+                        `user_id` INT(11) NOT NULL,
+                        `work_date` DATE NOT NULL,
+                        `shift_type` VARCHAR(100) NOT NULL DEFAULT 'Standard Full Day',
+                        `start_time` DATETIME NOT NULL,
+                        `end_time` DATETIME DEFAULT NULL,
+                        `total_hours` DECIMAL(5,2) DEFAULT NULL,
+                        `status` ENUM('In Progress', 'Completed', 'Approved') NOT NULL DEFAULT 'In Progress',
+                        `tasks_summary` TEXT DEFAULT NULL,
+                        `notes` TEXT DEFAULT NULL,
+                        `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        PRIMARY KEY (`id`),
+                        INDEX `idx_care_user` (`user_id`),
+                        INDEX `idx_care_date` (`work_date`),
+                        INDEX `idx_care_status` (`status`)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+                ");
+            } catch (Exception $e2) {}
+        }
     }
 
     private static function renderDbError(string $message): void {

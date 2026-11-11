@@ -93,7 +93,8 @@ function isCustomerCare(): bool {
 function requireAdmin(): void {
     if (!isLoggedIn()) {
         $_SESSION['error_flash'] = "Please log in to access the Admin Portal.";
-        header("Location: " . BASE_URL . "/login.php?redirect=" . urlencode($_SERVER['REQUEST_URI']));
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+        header("Location: " . BASE_URL . "/login.php?redirect=" . urlencode($uri));
         exit;
     }
     if (getUserRole() !== 'admin') {
@@ -109,7 +110,8 @@ function requireAdmin(): void {
 function requireCustomerCare(): void {
     if (!isLoggedIn()) {
         $_SESSION['error_flash'] = "Please log in to access the Customer Care Portal.";
-        header("Location: " . BASE_URL . "/login.php?redirect=" . urlencode($_SERVER['REQUEST_URI']));
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+        header("Location: " . BASE_URL . "/login.php?redirect=" . urlencode($uri));
         exit;
     }
     if (getUserRole() !== 'customer_care' && getUserRole() !== 'admin') {
@@ -125,7 +127,8 @@ function requireCustomerCare(): void {
 function requireDeveloper(): void {
     if (!isLoggedIn()) {
         $_SESSION['error_flash'] = "Please log in to access the Developer Portal.";
-        header("Location: " . BASE_URL . "/login.php?redirect=" . urlencode($_SERVER['REQUEST_URI']));
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+        header("Location: " . BASE_URL . "/login.php?redirect=" . urlencode($uri));
         exit;
     }
     if (getUserRole() !== 'developer' && getUserRole() !== 'admin') {
@@ -141,7 +144,8 @@ function requireDeveloper(): void {
 function requireLogin(): void {
     if (!isLoggedIn()) {
         $_SESSION['error_flash'] = "Please log in to continue.";
-        header("Location: " . BASE_URL . "/login.php?redirect=" . urlencode($_SERVER['REQUEST_URI']));
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+        header("Location: " . BASE_URL . "/login.php?redirect=" . urlencode($uri));
         exit;
     }
 }

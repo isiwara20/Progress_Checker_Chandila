@@ -70,6 +70,14 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             </a>
         </li>
 
+        <!-- Customer Care Working Hours Link -->
+        <li class="admin-menu-item">
+            <a href="<?php echo BASE_URL; ?>/admin/care_hours.php" class="admin-menu-link <?php echo ($currentPage === 'care_hours.php') ? 'active' : ''; ?>">
+                <i class="fa-solid fa-business-time text-warning"></i>
+                <span>Care Working Hours</span>
+            </a>
+        </li>
+
         <!-- 6. Assign Projects -->
         <li class="admin-menu-item">
             <a href="<?php echo BASE_URL; ?>/admin/assign.php" class="admin-menu-link <?php echo ($currentPage === 'assign.php') ? 'active' : ''; ?>">

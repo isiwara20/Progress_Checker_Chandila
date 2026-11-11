@@ -81,7 +81,10 @@ $developers = $pdo->query("
         <h3 class="text-dark fw-bold mb-1"><i class="fa-solid fa-users text-primary me-2"></i> Staff & Team Management</h3>
         <p class="text-secondary small mb-0">Manage developer and customer care logins, credentials, workloads, and department roles.</p>
     </div>
-    <div>
+    <div class="d-flex gap-2">
+        <a href="<?php echo BASE_URL; ?>/admin/care_hours.php" class="btn btn-outline-warning btn-sm">
+            <i class="fa-solid fa-business-time me-1"></i> Care Working Hours
+        </a>
         <button type="button" class="btn btn-electric btn-sm" data-bs-toggle="modal" data-bs-target="#modalAddDeveloper">
             <i class="fa-solid fa-user-plus me-1"></i> Add New Staff Member
         </button>
@@ -136,9 +139,15 @@ $developers = $pdo->query("
                 </div>
 
                 <div class="d-flex gap-2">
-                    <a href="<?php echo BASE_URL; ?>/admin/projects.php?dev=<?php echo $dev['id']; ?>" class="btn btn-sm btn-outline-primary w-100">
-                        <i class="fa-solid fa-folder-open me-1"></i> View Projects
-                    </a>
+                    <?php if (($dev['role'] ?? '') === 'customer_care'): ?>
+                        <a href="<?php echo BASE_URL; ?>/admin/care_hours.php?user_id=<?php echo $dev['id']; ?>" class="btn btn-sm btn-outline-warning w-100">
+                            <i class="fa-solid fa-business-time me-1"></i> View Care Hours
+                        </a>
+                    <?php else: ?>
+                        <a href="<?php echo BASE_URL; ?>/admin/projects.php?dev=<?php echo $dev['id']; ?>" class="btn btn-sm btn-outline-primary w-100">
+                            <i class="fa-solid fa-folder-open me-1"></i> View Projects
+                        </a>
+                    <?php endif; ?>
                     <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST">
                         <?php echo csrfField(); ?>
                         <input type="hidden" name="action" value="toggle_status">

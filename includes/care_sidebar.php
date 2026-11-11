@@ -82,6 +82,19 @@ $currentUser = getCurrentUser();
             </a>
         </li>
 
+        <li class="admin-menu-header">Shift & Attendance</li>
+
+        <!-- 7. Working Hours & Duty Period -->
+        <li class="admin-menu-item">
+            <a href="<?php echo BASE_URL; ?>/care/hours.php" class="admin-menu-link <?php echo ($currentPage === 'hours.php') ? 'active' : ''; ?>">
+                <i class="fa-solid fa-business-time text-warning"></i>
+                <span>Working Hours & Duty</span>
+                <?php if (!empty($activeCareDuty)): ?>
+                    <span class="admin-menu-badge bg-success text-white">On Duty</span>
+                <?php endif; ?>
+            </a>
+        </li>
+
         <?php if (getUserRole() === 'admin'): ?>
             <li class="admin-menu-header">Administrator Access</li>
             <li class="admin-menu-item">
@@ -91,6 +104,14 @@ $currentUser = getCurrentUser();
                 </a>
             </li>
         <?php endif; ?>
+
+        <!-- Sign Out -->
+        <li class="admin-menu-item mt-3 pt-2 border-top border-secondary border-opacity-10">
+            <a href="<?php echo BASE_URL; ?>/logout.php" class="admin-menu-link text-danger admin-logout-trigger" data-confirm-logout="true" title="Log out of session">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Sign Out</span>
+            </a>
+        </li>
     </ul>
 
     <!-- User Profile Footer with Confirm Logout Modal Trigger -->
@@ -104,9 +125,9 @@ $currentUser = getCurrentUser();
                 <?php echo (getUserRole() === 'admin') ? 'Admin • Care View' : 'Customer Care'; ?>
             </div>
         </div>
-        <button type="button" class="btn btn-link text-secondary p-0 border-0" data-bs-toggle="modal" data-bs-target="#logoutConfirmModal" title="Sign Out">
-            <i class="fa-solid fa-right-from-bracket text-danger fs-5"></i>
-        </button>
+        <a href="<?php echo BASE_URL; ?>/logout.php" class="text-danger p-1 text-decoration-none admin-logout-trigger" data-confirm-logout="true" title="Sign Out">
+            <i class="fa-solid fa-right-from-bracket fs-5"></i>
+        </a>
     </div>
 </aside>
 

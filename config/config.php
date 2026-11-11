@@ -129,3 +129,19 @@ if (session_status() === PHP_SESSION_NONE) {
     ]);
     session_start();
 }
+
+/**
+ * Global HTTP Redirect Helper
+ * Always available across the application
+ */
+if (!function_exists('redirect')) {
+    function redirect(string $url): void {
+        if (!headers_sent()) {
+            header("Location: {$url}");
+            exit;
+        }
+        echo "<script>window.location.href=" . json_encode($url) . ";</script>";
+        echo "<noscript><meta http-equiv=\"refresh\" content=\"0;url=" . htmlspecialchars($url) . "\"></noscript>";
+        exit;
+    }
+}

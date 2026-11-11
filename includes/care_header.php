@@ -17,10 +17,16 @@ $carePage = basename($_SERVER['PHP_SELF']);
 // Dynamic sidebar badges
 $unassignedCount = 0;
 $pendingPaymentsCount = 0;
+$activeCareDuty = null;
 if ($pdo) {
     try {
         $unassignedCount = (int)$pdo->query("SELECT COUNT(*) FROM projects WHERE assigned_developer_id IS NULL AND status != 'Cancelled'")->fetchColumn();
         $pendingPaymentsCount = (int)$pdo->query("SELECT COUNT(*) FROM payments WHERE status = 'Pending'")->fetchColumn();
+        if (!empty($currentUser['id'])) {
+            $stmtDuty = $pdo->prepare("SELECT * FROM care_working_hours WHERE user_id = ? AND status = 'In Progress' ORDER BY id DESC LIMIT 1");
+            $stmtDuty->execute([$currentUser['id']]);
+            $activeCareDuty = $stmtDuty->fetch();
+        }
     } catch (Exception $e) {}
 }
 ?>
@@ -69,6 +75,12 @@ if ($pdo) {
             </div>
 
             <div class="d-flex align-items-center gap-2">
+                <!-- Duty / Working Hours Live Indicator -->
+                <a href="<?php echo BASE_URL; ?>/care/hours.php" class="btn btn-sm <?php echo $activeCareDuty ? 'btn-outline-success bg-success-subtle text-success border-success' : 'btn-outline-secondary'; ?> d-inline-flex align-items-center gap-1 text-decoration-none px-2 py-1" title="<?php echo $activeCareDuty ? 'Currently ON DUTY since ' . date('h:i A', strtotime($activeCareDuty['start_time'])) . ' (' . htmlspecialchars($activeCareDuty['shift_type']) . ')' : 'Currently OFF DUTY – Click to Clock In / Log Hours'; ?>">
+                    <i class="fa-solid fa-clock<?php echo $activeCareDuty ? ' fa-spin-pulse text-success' : ''; ?>"></i>
+                    <span class="d-none d-sm-inline fw-semibold small"><?php echo $activeCareDuty ? 'On Duty (' . date('h:i A', strtotime($activeCareDuty['start_time'])) . ')' : 'Off Duty'; ?></span>
+                </a>
+
                 <!-- Fast Quick Action: Enter Order -->
                 <a href="<?php echo BASE_URL; ?>/care/orders.php" class="btn btn-sm btn-electric d-none d-md-inline-flex align-items-center">
                     <i class="fa-solid fa-cart-plus me-1"></i> Enter Order
@@ -97,6 +109,11 @@ if ($pdo) {
                         </li>
                         <li><hr class="dropdown-divider my-2"></li>
                         <li>
+                            <a class="dropdown-item small" href="<?php echo BASE_URL; ?>/care/hours.php">
+                                <i class="fa-solid fa-business-time me-2 text-warning"></i> Working Hours & Duty
+                            </a>
+                        </li>
+                        <li>
                             <a class="dropdown-item small" href="<?php echo BASE_URL; ?>/care/index.php">
                                 <i class="fa-solid fa-book-open me-2 text-primary"></i> SOP Operating Guide
                             </a>
@@ -115,9 +132,9 @@ if ($pdo) {
                         <?php endif; ?>
                         <li><hr class="dropdown-divider my-2"></li>
                         <li>
-                            <button type="button" class="dropdown-item small text-danger" data-bs-toggle="modal" data-bs-target="#logoutConfirmModal">
-                                <i class="fa-solid fa-right-from-bracket me-2"></i> Sign Out
-                            </button>
+                            <a class="dropdown-item small text-danger admin-logout-trigger" href="<?php echo BASE_URL; ?>/logout.php" data-confirm-logout="true">
+                                <i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Sign Out
+                            </a>
                         </li>
                     </ul>
                 </div>

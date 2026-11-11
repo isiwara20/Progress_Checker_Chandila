@@ -46,6 +46,16 @@ $devs = $pdo->query("
     ORDER BY ongoing_count ASC
 ")->fetchAll();
 
+// Fetch Care Agent's Today Logged Hours
+$todayCareHours = 0;
+if ($pdo && !empty($currentUser['id'])) {
+    try {
+        $stmtCareH = $pdo->prepare("SELECT COALESCE(SUM(total_hours), 0) FROM care_working_hours WHERE user_id = ? AND work_date = CURDATE() AND status IN ('Completed', 'Approved')");
+        $stmtCareH->execute([$currentUser['id']]);
+        $todayCareHours = (float)$stmtCareH->fetchColumn();
+    } catch (Exception $e) {}
+}
+
 require_once __DIR__ . '/../includes/care_header.php';
 ?>
 
@@ -72,6 +82,73 @@ require_once __DIR__ . '/../includes/care_header.php';
             <a href="<?php echo BASE_URL; ?>/care/payments.php" class="btn btn-success btn-sm px-3 py-2 text-white">
                 <i class="fa-solid fa-credit-card me-1"></i> Mark Payments Done
             </a>
+        </div>
+    </div>
+</div>
+
+<!-- Customer Care Duty & Working Hours Live Widget -->
+<div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; <?php echo $activeCareDuty ? 'background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%); border: 1.5px solid #86efac !important;' : 'background: #ffffff; border: 1.5px solid #e2e8f0 !important;'; ?>">
+    <div class="card-body p-3 p-md-4">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 52px; height: 52px; font-size: 1.3rem; <?php echo $activeCareDuty ? 'background: #10b981; color: #fff;' : 'background: #f1f5f9; color: #64748b;'; ?>">
+                    <i class="fa-solid <?php echo $activeCareDuty ? 'fa-business-time fa-bounce' : 'fa-clock'; ?>"></i>
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <?php if ($activeCareDuty): ?>
+                            <span class="badge bg-success px-2 py-1 text-white fw-bold"><i class="fa-solid fa-circle fa-beat-fade me-1 small"></i> ON DUTY</span>
+                            <span class="badge bg-light text-dark border"><?php echo htmlspecialchars($activeCareDuty['shift_type']); ?></span>
+                        <?php else: ?>
+                            <span class="badge bg-secondary px-2 py-1 text-white">OFF DUTY</span>
+                            <span class="text-muted small">Not currently clocked in</span>
+                        <?php endif; ?>
+                    </div>
+                    <h5 class="mb-0 text-dark fw-bold">
+                        <?php if ($activeCareDuty): ?>
+                            Active Shift Started at <span class="text-success"><?php echo date('h:i A', strtotime($activeCareDuty['start_time'])); ?></span>
+                        <?php else: ?>
+                            Ready to start your Customer Care shift?
+                        <?php endif; ?>
+                    </h5>
+                    <div class="text-secondary small mt-1">
+                        <?php if ($activeCareDuty): ?>
+                            Shift Date: <?php echo date('l, M j, Y', strtotime($activeCareDuty['work_date'])); ?> • Remember to record customer notes when clocking out.
+                        <?php else: ?>
+                            Hours completed today: <strong><?php echo number_format($todayCareHours, 2); ?> hrs</strong> • Select shift and clock in below.
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <?php if ($activeCareDuty): ?>
+                    <a href="<?php echo BASE_URL; ?>/care/hours.php" class="btn btn-danger btn-sm px-3 py-2 fw-semibold shadow-sm">
+                        <i class="fa-solid fa-stopwatch me-1"></i> Clock Out / End Shift
+                    </a>
+                    <a href="<?php echo BASE_URL; ?>/care/hours.php" class="btn btn-outline-success btn-sm px-3 py-2">
+                        <i class="fa-solid fa-calendar-check me-1"></i> View Timesheet
+                    </a>
+                <?php else: ?>
+                    <form action="<?php echo BASE_URL; ?>/care/hours.php" method="POST" class="d-inline-flex gap-2">
+                        <input type="hidden" name="csrf_token" value="<?php echo generateCsrfToken(); ?>">
+                        <input type="hidden" name="action" value="clock_in">
+                        <select name="shift_type" class="form-select form-select-sm" style="min-width: 220px;" required>
+                            <option value="Standard Full Day (08:30 AM – 05:30 PM)">Standard (08:30 AM – 05:30 PM)</option>
+                            <option value="Morning Shift (08:00 AM – 01:00 PM)">Morning (08:00 AM – 01:00 PM)</option>
+                            <option value="Evening Shift (01:00 PM – 07:00 PM)">Evening (01:00 PM – 07:00 PM)</option>
+                            <option value="Night Shift / On-Call Support">Night / On-Call Support</option>
+                            <option value="Custom / Overtime Duty">Custom / Overtime</option>
+                        </select>
+                        <button type="submit" class="btn btn-success btn-sm px-3 py-2 text-nowrap fw-semibold">
+                            <i class="fa-solid fa-play me-1"></i> Clock In
+                        </button>
+                    </form>
+                    <a href="<?php echo BASE_URL; ?>/care/hours.php" class="btn btn-outline-secondary btn-sm px-3 py-2" title="View Timesheet & History">
+                        <i class="fa-solid fa-calendar-days me-1"></i> Duty History
+                    </a>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 </div>

@@ -343,6 +343,30 @@ CREATE TABLE `career_applications` (
   INDEX `idx_career_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- --------------------------------------------------------
+-- Table: care_working_hours (Customer Care Duty & Work Hours)
+-- --------------------------------------------------------
+DROP TABLE IF EXISTS `care_working_hours`;
+CREATE TABLE `care_working_hours` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `user_id` INT(11) NOT NULL,
+  `work_date` DATE NOT NULL,
+  `shift_type` VARCHAR(100) NOT NULL DEFAULT 'Standard Full Day',
+  `start_time` DATETIME NOT NULL,
+  `end_time` DATETIME DEFAULT NULL,
+  `total_hours` DECIMAL(5,2) DEFAULT NULL,
+  `status` ENUM('In Progress', 'Completed', 'Approved') NOT NULL DEFAULT 'In Progress',
+  `tasks_summary` TEXT DEFAULT NULL,
+  `notes` TEXT DEFAULT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  INDEX `idx_care_user` (`user_id`),
+  INDEX `idx_care_date` (`work_date`),
+  INDEX `idx_care_status` (`status`),
+  CONSTRAINT `fk_care_hours_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- =======================================================================
 -- INITIAL SEED DATA
