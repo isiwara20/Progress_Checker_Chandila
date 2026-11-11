@@ -36,7 +36,7 @@ $pageTitle = $pageTitle ?? 'Chandila Web Development – Where Innovation Meets 
     <!-- Toast Notification System (Early Load) -->
     <script src="<?php echo BASE_URL; ?>/assets/js/toast.js"></script>
 </head>
-<body>
+<body class="has-fixed-header">
 
     <?php if (empty($disablePreloader)): ?>
     <!-- Site Animated Preloader (Initial Page Load Animation) -->
@@ -71,83 +71,86 @@ $pageTitle = $pageTitle ?? 'Chandila Web Development – Where Innovation Meets 
     </script>
     <?php endif; ?>
 
-    <!-- Top Contact Bar -->
-    <div class="top-contact-bar py-2 d-none d-md-block">
-        <div class="container d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center gap-4">
-                <span><i class="fa-solid fa-location-dot text-warning me-1"></i> Colombo, Sri Lanka</span>
-                <span><i class="fa-solid fa-phone text-warning me-1"></i> <a href="tel:0768433340" class="text-white text-decoration-none">076 843 3340</a></span>
-                <span><i class="fa-solid fa-envelope text-warning me-1"></i> contact@chandilaweb.com</span>
-            </div>
-            <div class="d-flex align-items-center gap-3">
-                <a href="https://wa.me/9476843340" target="_blank" class="badge bg-success text-white px-2 py-1 text-decoration-none">
-                    <i class="fa-brands fa-whatsapp me-1"></i> WhatsApp: 076 843 3340
-                </a>
-                <a href="<?php echo BASE_URL; ?>/customer_login.php">
-                    <i class="fa-solid fa-user-lock me-1"></i> Customer Login
-                </a>
-                <span class="text-secondary opacity-50">|</span>
-                <?php if (isLoggedIn()): ?>
-                    <a href="<?php echo getUserRole() === 'admin' ? BASE_URL . '/admin/' : BASE_URL . '/developer/'; ?>" class="text-warning fw-semibold">
-                        <i class="fa-solid fa-gauge me-1"></i> My Portal (<?php echo htmlspecialchars(getUserName()); ?>)
+    <!-- Fixed Header Container: Top Contact Bar + Main Navigation Bar Locked Permanently On Screen -->
+    <header class="chandila-fixed-header-wrapper">
+        <!-- Top Contact Bar -->
+        <div class="top-contact-bar py-2 d-none d-md-block">
+            <div class="container d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-4">
+                    <span><i class="fa-solid fa-location-dot text-warning me-1"></i> Colombo, Sri Lanka</span>
+                    <span><i class="fa-solid fa-phone text-warning me-1"></i> <a href="tel:0768433340" class="text-white text-decoration-none">076 843 3340</a></span>
+                    <span><i class="fa-solid fa-envelope text-warning me-1"></i> contact@chandilaweb.com</span>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <a href="https://wa.me/9476843340" target="_blank" class="badge bg-success text-white px-2 py-1 text-decoration-none">
+                        <i class="fa-brands fa-whatsapp me-1"></i> WhatsApp: 076 843 3340
                     </a>
-                <?php else: ?>
-                    <a href="<?php echo BASE_URL; ?>/login.php">
-                        <i class="fa-solid fa-lock me-1"></i> Staff Login
+                    <a href="<?php echo BASE_URL; ?>/customer_login.php">
+                        <i class="fa-solid fa-user-lock me-1"></i> Customer Login
                     </a>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light navbar-chandila sticky-top">
-        <div class="container">
-            <a class="navbar-brand py-1" href="<?php echo BASE_URL; ?>/index.php">
-                <img src="<?php echo BASE_URL; ?>/assets/images/logo.png" alt="Chandila Web Development" class="brand-logo-img">
-            </a>
-
-            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarMain">
-                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link <?php echo ($currentPage === 'index.php') ? 'active' : ''; ?>" href="<?php echo BASE_URL; ?>/index.php">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link <?php echo ($currentPage === 'about.php') ? 'active' : ''; ?>" href="<?php echo BASE_URL; ?>/about.php">About Us</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link <?php echo ($currentPage === 'services.php') ? 'active' : ''; ?>" href="<?php echo BASE_URL; ?>/services.php">Our Services</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link <?php echo ($currentPage === 'portfolio.php') ? 'active' : ''; ?>" href="<?php echo BASE_URL; ?>/portfolio.php">
-                            Portfolio <span class="badge bg-warning text-dark font-monospace" style="font-size: 0.7rem;">500+</span>
+                    <span class="text-secondary opacity-50">|</span>
+                    <?php if (isLoggedIn()): ?>
+                        <a href="<?php echo getUserRole() === 'admin' ? BASE_URL . '/admin/' : BASE_URL . '/developer/'; ?>" class="text-warning fw-semibold">
+                            <i class="fa-solid fa-gauge me-1"></i> My Portal (<?php echo htmlspecialchars(getUserName()); ?>)
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link <?php echo ($currentPage === 'careers.php') ? 'active' : ''; ?>" href="<?php echo BASE_URL; ?>/careers.php">
-                            Careers <span class="badge bg-primary text-white font-monospace" style="font-size: 0.65rem;">Hiring</span>
+                    <?php else: ?>
+                        <a href="<?php echo BASE_URL; ?>/login.php">
+                            <i class="fa-solid fa-lock me-1"></i> Staff Login
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link <?php echo ($currentPage === 'track_project.php') ? 'active' : ''; ?>" href="<?php echo BASE_URL; ?>/track_project.php">
-                            <i class="fa-solid fa-crosshairs text-primary me-1"></i> Track My Project
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link <?php echo ($currentPage === 'contact.php') ? 'active' : ''; ?>" href="<?php echo BASE_URL; ?>/contact.php">Contact</a>
-                    </li>
-                </ul>
-
-                <div class="d-flex align-items-center gap-2">
-                    <a href="<?php echo BASE_URL; ?>/request_project.php" class="btn btn-gold d-flex align-items-center gap-2">
-                        <i class="fa-solid fa-paper-plane"></i>
-                        <span>Request a Project</span>
-                    </a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
-    </nav>
+
+        <!-- Main Navigation Bar -->
+        <nav class="navbar navbar-expand-lg navbar-light navbar-chandila">
+            <div class="container">
+                <a class="navbar-brand py-1" href="<?php echo BASE_URL; ?>/index.php">
+                    <img src="<?php echo BASE_URL; ?>/assets/images/logo.png" alt="Chandila Web Development" class="brand-logo-img">
+                </a>
+
+                <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarMain">
+                    <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link <?php echo ($currentPage === 'index.php') ? 'active' : ''; ?>" href="<?php echo BASE_URL; ?>/index.php">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?php echo ($currentPage === 'about.php') ? 'active' : ''; ?>" href="<?php echo BASE_URL; ?>/about.php">About Us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?php echo ($currentPage === 'services.php') ? 'active' : ''; ?>" href="<?php echo BASE_URL; ?>/services.php">Our Services</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?php echo ($currentPage === 'portfolio.php') ? 'active' : ''; ?>" href="<?php echo BASE_URL; ?>/portfolio.php">
+                                Portfolio <span class="badge bg-warning text-dark font-monospace" style="font-size: 0.7rem;">500+</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?php echo ($currentPage === 'careers.php') ? 'active' : ''; ?>" href="<?php echo BASE_URL; ?>/careers.php">
+                                Careers <span class="badge bg-primary text-white font-monospace" style="font-size: 0.65rem;">Hiring</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?php echo ($currentPage === 'track_project.php') ? 'active' : ''; ?>" href="<?php echo BASE_URL; ?>/track_project.php">
+                                <i class="fa-solid fa-crosshairs text-primary me-1"></i> Track My Project
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?php echo ($currentPage === 'contact.php') ? 'active' : ''; ?>" href="<?php echo BASE_URL; ?>/contact.php">Contact</a>
+                        </li>
+                    </ul>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <a href="<?php echo BASE_URL; ?>/request_project.php" class="btn btn-gold d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <span>Request a Project</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>

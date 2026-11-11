@@ -115,5 +115,19 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
+
+    // 6. Header Transparency on Scroll (Glassmorphism Effect)
+    const headerWrapper = document.querySelector('.chandila-fixed-header-wrapper');
+    if (headerWrapper) {
+        function checkHeaderTransparency() {
+            if (window.scrollY > 15) {
+                headerWrapper.classList.add('is-scrolled');
+            } else {
+                headerWrapper.classList.remove('is-scrolled');
+            }
+        }
+        window.addEventListener('scroll', checkHeaderTransparency, { passive: true });
+        checkHeaderTransparency();
+    }
 });
 

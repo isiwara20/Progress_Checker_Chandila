@@ -44,6 +44,18 @@ body {
   line-height: 1.6;
 }
 
+body.has-fixed-header,
+body:has(.chandila-fixed-header-wrapper) {
+  padding-top: 108px;
+}
+
+@media (max-width: 767.98px) {
+  body.has-fixed-header,
+  body:has(.chandila-fixed-header-wrapper) {
+    padding-top: 66px;
+  }
+}
+
 /* Typography & Links */
 h1, h2, h3, h4, h5, h6 {
   color: var(--text-main);
@@ -61,12 +73,55 @@ a:hover {
   color: var(--accent-blue-dark);
 }
 
+/* Fixed Header Container (Locked Permanently at Top of Screen) */
+.chandila-fixed-header-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 1030;
+  background: #ffffff;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.08);
+  transition: background 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+/* Glassmorphism Semi-Transparent state on scroll */
+.chandila-fixed-header-wrapper.is-scrolled {
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.12);
+}
+
+.chandila-fixed-header-wrapper .top-contact-bar {
+  transition: background 0.3s ease;
+}
+
+.chandila-fixed-header-wrapper.is-scrolled .top-contact-bar {
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
 /* Navbar */
 .navbar-chandila {
-  background: #ffffff;
+  position: relative;
+  background: transparent;
   border-bottom: 1px solid var(--border-color);
-  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+  box-shadow: none;
   transition: all 0.3s ease;
+}
+
+@media (max-width: 991.98px) {
+  .chandila-fixed-header-wrapper .navbar-collapse {
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    background: #ffffff;
+    padding: 14px 18px;
+    border-radius: 0 0 14px 14px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+  }
 }
 
 .brand-logo-img {
