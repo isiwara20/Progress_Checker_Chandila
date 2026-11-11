@@ -351,7 +351,7 @@ require_once __DIR__ . '/../includes/care_header.php';
                     </h6>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label text-dark small fw-semibold">Total Project Cost (<?php echo CURRENCY_SYMBOL; ?>) <span class="text-danger">*</span></label>
+                    <label class="form-label text-dark small fw-semibold">Total Project Cost (<?php echo getCurrencySymbol(); ?>) <span class="text-danger">*</span></label>
                     <input type="number" step="0.01" class="form-control form-control-chandila fw-bold text-primary" id="totalCostInput" name="total_cost" placeholder="250000.00" required>
                 </div>
                 <div class="col-md-3">

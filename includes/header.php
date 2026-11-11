@@ -31,6 +31,8 @@ $pageTitle = $pageTitle ?? 'Chandila Web Development – Where Innovation Meets 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Custom Public CSS -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/style.css?v=<?php echo filemtime(__DIR__ . '/../assets/css/style.css'); ?>">
+    <!-- Client Assistant & Order Tracking Chatbot CSS -->
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/chatbot.css?v=<?php echo file_exists(__DIR__ . '/../assets/css/chatbot.css') ? filemtime(__DIR__ . '/../assets/css/chatbot.css') : time(); ?>">
     <!-- Toast Notification System (Early Load) -->
     <script src="<?php echo BASE_URL; ?>/assets/js/toast.js"></script>
 </head>

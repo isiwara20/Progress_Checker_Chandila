@@ -475,7 +475,7 @@ require_once __DIR__ . '/../includes/care_header.php';
 
                     <!-- Payment Amount -->
                     <div class="mb-3">
-                        <label class="form-label text-dark small fw-semibold">Amount Received (<?php echo CURRENCY_SYMBOL; ?>) <span class="text-danger">*</span></label>
+                        <label class="form-label text-dark small fw-semibold">Amount Received (<?php echo getCurrencySymbol(); ?>) <span class="text-danger">*</span></label>
                         <input type="number" step="0.01" class="form-control form-control-chandila fw-bold text-success fs-5" name="amount" id="modalAmountInput" placeholder="0.00" required>
                         <div class="form-text small" id="suggestedDueHint">Select project to see milestone suggested amount</div>
                     </div>

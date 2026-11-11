@@ -144,6 +144,23 @@ class Database {
 
     private static function renderDbError(string $message): void {
         http_response_code(500);
+
+        // Return JSON error if API endpoint or JSON requested
+        if (
+            (!empty($_SERVER['HTTP_ACCEPT']) && str_contains($_SERVER['HTTP_ACCEPT'], 'json')) ||
+            (!empty($_SERVER['REQUEST_URI']) && str_contains($_SERVER['REQUEST_URI'], '/api/')) ||
+            (isset($_SERVER['CONTENT_TYPE']) && str_contains($_SERVER['CONTENT_TYPE'], 'json'))
+        ) {
+            if (!headers_sent()) {
+                header('Content-Type: application/json; charset=utf-8');
+            }
+            echo json_encode([
+                'success' => false, 
+                'message' => 'Database connection unavailable: ' . $message,
+                'reply'   => 'Database connection unavailable. Please reach our Customer Care on WhatsApp at 076 843 3340.'
+            ]);
+            exit;
+        }
         ?>
         <!DOCTYPE html>
         <html lang="en">

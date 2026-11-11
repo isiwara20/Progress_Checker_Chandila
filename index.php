@@ -13,18 +13,18 @@ require_once __DIR__ . '/includes/header.php';
     <div class="container">
         <div class="row align-items-center g-4 g-lg-5">
             <!-- Left Hero Content -->
-            <div class="col-lg-7 hero-content-col">
-                <div class="hero-badge anim-fade-down">
+            <div class="col-lg-7 hero-content-col text-center text-lg-start">
+                <div class="hero-badge anim-fade-down mx-auto mx-lg-0">
                     <i class="fa-solid fa-trophy me-2 text-warning"></i> Over 500+ Successful Projects Delivered
                 </div>
-                <h1 class="hero-title anim-fade-up anim-delay-1">
+                <h1 class="hero-title anim-fade-up anim-delay-1 text-center text-lg-start">
                     Where Innovation <span class="text-gradient">Meets Growth</span>
                 </h1>
-                <p class="hero-subtitle anim-fade-up anim-delay-2">
+                <p class="hero-subtitle anim-fade-up anim-delay-2 mx-auto mx-lg-0 text-center text-lg-start">
                     At <strong>Chandila Web Development</strong>, we engineer tailored business websites, high-conversion e-commerce stores, cloud POS systems, and custom web portals with transparent milestone escrow and real-time customer WhatsApp tracking.
                 </p>
-                <div class="d-flex flex-wrap gap-3 mb-4 anim-fade-up anim-delay-3 hero-action-buttons">
-                    <a href="<?php echo BASE_URL; ?>/request_project.php" class="btn btn-chandila-primary btn-lg shadow-sm">
+                <div class="d-flex flex-wrap gap-3 mb-4 anim-fade-up anim-delay-3 hero-action-buttons justify-content-center justify-content-lg-start">
+                    <a href="<?php echo BASE_URL; ?>/request_project.php" class="btn btn-electric btn-chandila-primary btn-lg shadow-sm">
                         <i class="fa-solid fa-paper-plane me-2"></i> Request a Project
                     </a>
                     <a href="<?php echo BASE_URL; ?>/portfolio.php" class="btn btn-outline-electric btn-lg">
@@ -34,21 +34,21 @@ require_once __DIR__ . '/includes/header.php';
 
                 <!-- Trust Badges (Fully Responsive on All Screen Sizes) -->
                 <div class="hero-trust-badges pt-3 mt-2 border-top border-secondary border-opacity-15 anim-fade-up anim-delay-4">
-                    <div class="row g-2 g-md-3">
+                    <div class="row g-2 g-md-3 justify-content-center">
                         <div class="col-4">
-                            <div class="trust-badge-card">
+                            <div class="trust-badge-card text-center">
                                 <div class="trust-badge-num text-dark">500+</div>
                                 <div class="trust-badge-label">Delivered Projects</div>
                             </div>
                         </div>
                         <div class="col-4">
-                            <div class="trust-badge-card">
+                            <div class="trust-badge-card text-center">
                                 <div class="trust-badge-num text-primary">100%</div>
                                 <div class="trust-badge-label">WhatsApp Live</div>
                             </div>
                         </div>
                         <div class="col-4">
-                            <div class="trust-badge-card">
+                            <div class="trust-badge-card text-center">
                                 <div class="trust-badge-num text-success">3-Stage</div>
                                 <div class="trust-badge-label">Milestone Escrow</div>
                             </div>
@@ -87,7 +87,7 @@ require_once __DIR__ . '/includes/header.php';
                             <div class="form-text text-secondary small">Verified against registered phone for dual-factor privacy.</div>
                         </div>
 
-                        <button type="submit" class="btn btn-chandila-primary w-100 py-3 fw-bold shadow-sm">
+                        <button type="submit" class="btn btn-electric btn-chandila-primary w-100 py-3 fw-bold shadow-sm">
                             <i class="fa-solid fa-magnifying-glass me-2"></i> Track Progress Now
                         </button>
                     </form>
@@ -102,14 +102,14 @@ require_once __DIR__ . '/includes/header.php';
 </section>
 
 <!-- Client Brands Carousel / Showcase Section (Featuring Real 500+ Projects) -->
-<section class="py-4 bg-white border-bottom border-secondary border-opacity-10">
+<section class="py-4 bg-white border-bottom border-secondary border-opacity-10 overflow-hidden">
     <div class="container">
-        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 mb-3">
-            <div>
-                <span class="badge bg-warning text-dark font-monospace text-uppercase px-2 py-1">Trusted By 500+ Businesses</span>
-                <span class="text-secondary small ms-2">Real deployed websites powered by Chandila Web Development:</span>
+        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 mb-3 text-center text-md-start">
+            <div class="w-100 w-md-auto">
+                <span class="badge bg-warning text-dark font-monospace text-uppercase px-2 py-1 mb-1 d-inline-block">Trusted By 500+ Businesses</span>
+                <span class="text-secondary small ms-md-2 d-block d-md-inline">Real deployed websites powered by Chandila Web Development:</span>
             </div>
-            <a href="<?php echo BASE_URL; ?>/portfolio.php" class="text-primary fw-semibold small">
+            <a href="<?php echo BASE_URL; ?>/portfolio.php" class="text-primary fw-semibold small text-nowrap">
                 Explore All 500+ Success Stories &rarr;
             </a>
         </div>
@@ -325,14 +325,14 @@ if ($pdo) {
 }
 ?>
 <?php if (!empty($featuredPosts)): ?>
-<section class="py-5 bg-white border-top border-secondary border-opacity-10">
+<section class="py-5 bg-white border-top border-secondary border-opacity-10 overflow-hidden">
     <div class="container py-3">
         <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-5">
             <div>
-                <span class="badge bg-warning text-dark fw-bold px-3 py-2 rounded-pill mb-2">
-                    <i class="fa-solid fa-photo-film me-1"></i> 1080x1080 PROJECT HIGHLIGHTS & UPDATES
+                <span class="badge bg-warning text-dark fw-bold px-3 py-2 rounded-pill mb-2 text-wrap" style="max-width: 100%; font-size: 0.8rem; line-height: 1.4;">
+                    <i class="fa-solid fa-photo-film me-1"></i> 1080x1080 PROJECT HIGHLIGHTS &amp; UPDATES
                 </span>
-                <h2 class="text-dark fw-bold mb-0">Latest Showcases & Social Posts</h2>
+                <h2 class="text-dark fw-bold mb-0">Latest Showcases &amp; Social Posts</h2>
             </div>
             <a href="<?php echo BASE_URL; ?>/posts.php" class="btn btn-outline-dark fw-semibold">
                 View All Showcases <i class="fa-solid fa-arrow-right ms-1"></i>
@@ -366,11 +366,11 @@ if ($pdo) {
                             <p class="text-secondary small mb-3 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
                                 <?php echo htmlspecialchars($fp['description']); ?>
                             </p>
-                            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                                <a href="<?php echo BASE_URL; ?>/posts.php" class="btn btn-sm btn-outline-dark px-3">
+                            <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center pt-3 border-top post-card-actions">
+                                <a href="<?php echo BASE_URL; ?>/posts.php" class="btn btn-sm btn-outline-dark px-3 flex-grow-1 text-center">
                                     <i class="fa-solid fa-expand me-1"></i> View Details
                                 </a>
-                                <a href="https://wa.me/9476843340?text=Hello%20Chandila%20Web%20Development,%20I%20saw%20your%20post%20about%20<?php echo urlencode($fp['title']); ?>%20and%20would%20like%20to%20discuss%20a%20similar%20project." target="_blank" class="btn btn-sm btn-success px-3 fw-bold">
+                                <a href="https://wa.me/9476843340?text=Hello%20Chandila%20Web%20Development,%20I%20saw%20your%20post%20about%20<?php echo urlencode($fp['title']); ?>%20and%20would%20like%20to%20discuss%20a%20similar%20project." target="_blank" class="btn btn-sm btn-success px-3 fw-bold flex-grow-1 text-center">
                                     <i class="fa-brands fa-whatsapp me-1"></i> Inquire (076 843 3340)
                                 </a>
                             </div>
@@ -384,18 +384,18 @@ if ($pdo) {
 <?php endif; ?>
 
 <!-- Call to Action Banner (Clean Light with Gold Accent) -->
-<section class="py-5 bg-light border-top border-secondary border-opacity-10">
+<section class="py-5 bg-light border-top border-secondary border-opacity-10 overflow-hidden">
     <div class="container py-4 text-center">
         <h2 class="text-dark fw-bold mb-3 display-6">Ready to Build Your Next Web Project?</h2>
         <p class="text-secondary mb-4 mx-auto fs-5" style="max-width: 600px;">
             Join our 500+ successful clients today. Submit your requirements and get an official Job ID with instant WhatsApp confirmation.
         </p>
-        <div class="d-flex justify-content-center flex-wrap gap-3">
+        <div class="d-flex justify-content-center flex-wrap gap-3 cta-action-buttons">
             <a href="<?php echo BASE_URL; ?>/request_project.php" class="btn btn-gold btn-lg">
                 <i class="fa-solid fa-paper-plane me-2"></i> Submit Project Requirement
             </a>
             <a href="https://wa.me/9476843340" target="_blank" class="btn btn-outline-success btn-lg">
-                <i class="fa-brands fa-whatsapp me-2"></i> Chat with Us Directly (076 843 3340)
+                <i class="fa-brands fa-whatsapp me-2"></i> WhatsApp: 076 843 3340
             </a>
         </div>
     </div>

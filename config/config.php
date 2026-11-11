@@ -36,6 +36,9 @@ if (!defined('DB_CHARSET')) define('DB_CHARSET', 'utf8mb4');
 if (!defined('APP_NAME')) define('APP_NAME', 'Chandila Web Development');
 if (!defined('APP_TAGLINE')) define('APP_TAGLINE', 'Premium Web & Digital Solutions');
 if (!defined('APP_VERSION')) define('APP_VERSION', '1.0.0');
+// Currency Configuration (Protected against PHP 8.2+ Intl extension CURRENCY_SYMBOL = 262145 collision)
+if (!defined('APP_CURRENCY_SYMBOL')) define('APP_CURRENCY_SYMBOL', 'Rs.');
+if (!defined('APP_CURRENCY_CODE')) define('APP_CURRENCY_CODE', 'LKR');
 if (!defined('CURRENCY_SYMBOL')) define('CURRENCY_SYMBOL', 'Rs.');
 if (!defined('CURRENCY_CODE')) define('CURRENCY_CODE', 'LKR');
 

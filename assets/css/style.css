@@ -132,6 +132,7 @@ a:hover {
   top: 0;
   left: 0;
   width: 100%;
+  max-width: 100vw;
   height: 100%;
   pointer-events: none;
   z-index: 1;
@@ -142,6 +143,7 @@ a:hover {
 .earth-canvas-wrapper canvas {
   display: block;
   width: 100%;
+  max-width: 100%;
   height: 100%;
 }
 
@@ -256,7 +258,7 @@ a:hover {
 }
 
 /* Custom Buttons */
-.btn-electric {
+.btn-electric, .btn-chandila-primary {
   background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
   color: #ffffff !important;
   font-weight: 600;
@@ -267,7 +269,7 @@ a:hover {
   transition: all 0.25s ease;
 }
 
-.btn-electric:hover {
+.btn-electric:hover, .btn-chandila-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
   background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
@@ -471,10 +473,10 @@ a:hover {
   100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
 }
 
-/* Floating WhatsApp Button */
+/* Floating WhatsApp Button (Positioned above Virtual Assistant Chatbot) */
 .floating-whatsapp {
   position: fixed;
-  bottom: 25px;
+  bottom: 95px;
   right: 25px;
   width: 58px;
   height: 58px;
@@ -486,7 +488,7 @@ a:hover {
   justify-content: center;
   font-size: 1.8rem;
   box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
-  z-index: 1050;
+  z-index: 1040;
   transition: all 0.3s ease;
 }
 
@@ -615,21 +617,56 @@ a:hover {
 @media (max-width: 991px) {
   .hero-section {
     padding: 55px 0 45px 0;
+    overflow: hidden !important;
+    overflow-x: clip !important;
+    max-width: 100vw !important;
+    width: 100% !important;
   }
   .hero-content-col {
-    padding-right: 0 !important;
     background: none !important;
+    text-align: center !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  .hero-badge {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: inline-flex !important;
   }
   .hero-title {
+    text-align: center !important;
     font-size: 2.45rem;
   }
   .hero-subtitle {
     font-size: 1.05rem;
     margin-bottom: 24px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    text-align: center !important;
+    max-width: 620px !important;
+  }
+  .hero-action-buttons {
+    justify-content: center !important;
+  }
+  .hero-trust-badges {
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  /* Neutralize horizontal slide animation on smaller screens so it never pushes the viewport */
+  .anim-slide-right,
+  .anim-slide-left {
+    transform: none !important;
+    animation: animFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both !important;
   }
   .track-widget {
     margin-top: 25px;
     padding: 26px 20px;
+    width: 100% !important;
+    max-width: 100% !important;
   }
   .navbar-nav {
     padding: 12px 0;
@@ -701,36 +738,90 @@ a:hover {
 
   .hero-section {
     padding: 35px 0 30px 0;
+    overflow: hidden !important;
+    overflow-x: clip !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+  }
+
+  .hero-content-col {
+    background: none !important;
+    text-align: center !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 
   .hero-title {
     font-size: 1.85rem;
     line-height: 1.22;
     margin-bottom: 14px;
+    word-break: break-word;
+    text-align: center !important;
   }
 
   .hero-badge {
     font-size: 0.76rem;
     padding: 4px 12px;
     margin-bottom: 12px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    max-width: 100%;
+    white-space: normal;
+    text-align: center;
+    display: inline-flex !important;
   }
 
   .hero-subtitle {
     font-size: 0.94rem;
     line-height: 1.55;
     margin-bottom: 20px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    text-align: center !important;
+    max-width: 100% !important;
   }
 
   /* Tap-friendly full-width hero action buttons on phones */
   .hero-action-buttons {
     flex-direction: column !important;
     gap: 10px !important;
+    width: 100% !important;
+    justify-content: center !important;
   }
   .hero-action-buttons .btn {
     width: 100% !important;
     text-align: center;
     padding: 11px 18px;
     font-size: 0.95rem;
+  }
+
+  /* Full-width responsive CTA action buttons on mobile */
+  .cta-action-buttons {
+    flex-direction: column !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+  .cta-action-buttons .btn {
+    width: 100% !important;
+    text-align: center !important;
+    padding: 11px 16px !important;
+    font-size: 0.95rem !important;
+    white-space: normal !important;
+  }
+
+  /* 1080x1080 Post card buttons on mobile */
+  .post-card-actions {
+    flex-direction: column !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  .post-card-actions .btn {
+    width: 100% !important;
+    text-align: center !important;
   }
 
   /* Responsive Trust Badges with zero horizontal overflow */
@@ -762,7 +853,7 @@ a:hover {
   }
 
   .floating-whatsapp {
-    bottom: 15px;
+    bottom: 82px;
     right: 15px;
     width: 48px;
     height: 48px;
@@ -841,7 +932,8 @@ a:hover {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
+  max-width: 100vw;
   height: 100vh;
   background: #ffffff;
   z-index: 999999;

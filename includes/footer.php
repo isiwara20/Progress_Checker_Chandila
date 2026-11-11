@@ -12,6 +12,65 @@
         <i class="fa-brands fa-whatsapp"></i>
     </a>
 
+    <!-- Floating Client Assistant & Order Tracking Chatbot Launcher -->
+    <div id="chandilaChatbotLauncher" class="chandila-chatbot-launcher">
+        <div id="chandilaChatbotPill" class="chandila-chatbot-pill" role="button" tabindex="0" title="Click to track order or chat with our assistant">
+            <span class="pulse-green-dot"></span>
+            <span>Track Order & Chat</span>
+        </div>
+        <button type="button" id="chandilaChatbotBtn" class="chandila-chatbot-btn" aria-label="Open Chatbot & Order Tracker" title="Chandila Virtual Assistant & Live Project Tracker">
+            <i class="fa-solid fa-comments"></i>
+            <span class="btn-badge-dot"></span>
+        </button>
+    </div>
+
+    <!-- Interactive Chatbot Window Modal / Drawer -->
+    <div id="chandilaChatbotWindow" class="chandila-chatbot-window" style="display: none;" role="dialog" aria-label="Project Tracker & Chatbot">
+        <!-- Header -->
+        <div class="chandila-chat-header">
+            <div class="d-flex align-items-center gap-2">
+                <div class="chandila-chat-avatar">
+                    <i class="fa-solid fa-robot"></i>
+                    <span class="online-indicator"></span>
+                </div>
+                <div class="chandila-chat-title">
+                    <h6>Chandila Assistant</h6>
+                    <p><i class="fa-solid fa-circle text-success" style="font-size:0.55rem;"></i> Live Project Tracker & Care</p>
+                </div>
+            </div>
+            <div class="chandila-chat-actions">
+                <button type="button" id="chandilaChatSoundBtn" class="chandila-chat-header-btn" title="Toggle Sound">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+                <button type="button" id="chandilaChatClearBtn" class="chandila-chat-header-btn" title="Restart / Clear Conversation">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+                <button type="button" id="chandilaChatMinimizeBtn" class="chandila-chat-header-btn" title="Minimize Chat">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+                <button type="button" id="chandilaChatCloseBtn" class="chandila-chat-header-btn" title="Close Chat">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Scrollable Messages Body -->
+        <div id="chandilaChatBody" class="chandila-chat-body"></div>
+
+        <!-- Quick Action Suggestion Chips -->
+        <div id="chandilaChatChips" class="chandila-chips-wrapper"></div>
+
+        <!-- Input Bar -->
+        <div class="chandila-chat-footer">
+            <form id="chandilaChatForm" class="chandila-chat-form" autocomplete="off">
+                <input type="text" id="chandilaChatInput" class="chandila-chat-input" placeholder="Type a message or Job ID (e.g. CHW-2026-0001)..." aria-label="Chat input">
+                <button type="submit" id="chandilaChatSendBtn" class="chandila-chat-send-btn" title="Send message" aria-label="Send">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="footer-chandila">
         <div class="container">
@@ -120,5 +179,10 @@
     <script src="<?php echo BASE_URL; ?>/assets/js/toast.js"></script>
     <!-- Custom Public Main JS -->
     <script src="<?php echo BASE_URL; ?>/assets/js/main.js"></script>
+    <!-- Virtual Assistant & Order Tracking Chatbot Client -->
+    <script>
+        window.CHANDILA_BASE_URL = '<?php echo BASE_URL; ?>';
+    </script>
+    <script src="<?php echo BASE_URL; ?>/assets/js/chatbot.js?v=<?php echo file_exists(__DIR__ . '/../assets/js/chatbot.js') ? filemtime(__DIR__ . '/../assets/js/chatbot.js') : time(); ?>"></script>
 </body>
 </html>

@@ -89,13 +89,27 @@ function logActivity(
 }
 
 /**
+ * Get Clean Application Currency Symbol
+ * Guarantees 'Rs.' and guards against PHP 8.2+ Intl constant collision (where CURRENCY_SYMBOL = 262145)
+ */
+function getCurrencySymbol(): string {
+    if (defined('APP_CURRENCY_SYMBOL') && is_string(APP_CURRENCY_SYMBOL) && APP_CURRENCY_SYMBOL !== '') {
+        return APP_CURRENCY_SYMBOL;
+    }
+    if (defined('CURRENCY_SYMBOL') && is_string(CURRENCY_SYMBOL) && !is_numeric(CURRENCY_SYMBOL)) {
+        return CURRENCY_SYMBOL;
+    }
+    return 'Rs.';
+}
+
+/**
  * Format Currency (Sri Lanka Rupees default)
  */
 function formatCurrency(?float $amount): string {
     if ($amount === null) {
         $amount = 0.00;
     }
-    return CURRENCY_SYMBOL . ' ' . number_format($amount, 2);
+    return getCurrencySymbol() . ' ' . number_format($amount, 2);
 }
 
 /**

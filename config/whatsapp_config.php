@@ -56,7 +56,7 @@ class WhatsAppService {
             case 'Second Payment Reminder':
                 $custName = $data['customer_name'] ?? 'Valued Customer';
                 $title = $data['project_title'] ?? 'Custom Project';
-                $cur = defined('CURRENCY_SYMBOL') ? CURRENCY_SYMBOL : 'Rs.';
+                $cur = function_exists('getCurrencySymbol') ? getCurrencySymbol() : (defined('APP_CURRENCY_SYMBOL') ? APP_CURRENCY_SYMBOL : 'Rs.');
                 $totalCost = isset($data['total_cost']) && (float)$data['total_cost'] > 0 ? $cur . ' ' . number_format((float)$data['total_cost'], 2) : 'Agreed Scope';
                 $totalPaid = isset($data['total_paid']) && (float)$data['total_paid'] > 0 ? $cur . ' ' . number_format((float)$data['total_paid'], 2) : ($cur . ' ' . number_format((float)($data['advance_amount'] ?? 0), 2));
                 
