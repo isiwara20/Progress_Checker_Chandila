@@ -236,23 +236,14 @@ function loginUser(PDO $pdo, string $usernameOrEmail, string $password): array {
 }
 
 /**
- * Logout User
+ * Logout User safely
  */
 function logoutUser(): void {
     $_SESSION = [];
-    if (ini_get("session.use_cookies")) {
-        $params = session_get_cookie_params();
-        setcookie(
-            session_name(),
-            '',
-            time() - 42000,
-            $params["path"],
-            $params["domain"],
-            $params["secure"],
-            $params["httponly"]
-        );
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_regenerate_id(true);
     }
-    session_destroy();
+    generateCsrfToken();
 }
 }
 

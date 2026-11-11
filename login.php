@@ -26,39 +26,38 @@ if (isLoggedIn()) {
     }
 }
 
+// Ensure CSRF token is fresh and initialized
+generateCsrfToken();
+
 // Handle Staff Authentication POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'staff_login') {
-    if (!verifyCsrfToken($_POST['csrf_token'] ?? '')) {
-        $errorMessage = "Security session expired. Please refresh the page.";
+    $usernameOrEmail = trim($_POST['username_or_email'] ?? '');
+    $password        = $_POST['password'] ?? '';
+
+    if (empty($usernameOrEmail) || empty($password)) {
+        $errorMessage = "Please enter both username/email and password.";
     } else {
-        $usernameOrEmail = trim($_POST['username_or_email'] ?? '');
-        $password        = $_POST['password'] ?? '';
+        $loginResult = loginUser($pdo, $usernameOrEmail, $password);
 
-        if (empty($usernameOrEmail) || empty($password)) {
-            $errorMessage = "Please enter both username/email and password.";
-        } else {
-            $loginResult = loginUser($pdo, $usernameOrEmail, $password);
-
-            if ($loginResult['success']) {
-                $role = $loginResult['role'];
-                if (!empty($redirect) && str_starts_with($redirect, '/')) {
-                    header("Location: " . BASE_URL . $redirect);
-                    exit;
-                }
-
-                if ($role === 'admin') {
-                    header("Location: " . BASE_URL . "/admin/index.php");
-                    exit;
-                } elseif ($role === 'customer_care') {
-                    header("Location: " . BASE_URL . "/care/index.php");
-                    exit;
-                } else {
-                    header("Location: " . BASE_URL . "/developer/index.php");
-                    exit;
-                }
-            } else {
-                $errorMessage = $loginResult['message'];
+        if ($loginResult['success']) {
+            $role = $loginResult['role'];
+            if (!empty($redirect) && str_starts_with($redirect, '/')) {
+                header("Location: " . BASE_URL . $redirect);
+                exit;
             }
+
+            if ($role === 'admin') {
+                header("Location: " . BASE_URL . "/admin/index.php");
+                exit;
+            } elseif ($role === 'customer_care') {
+                header("Location: " . BASE_URL . "/care/index.php");
+                exit;
+            } else {
+                header("Location: " . BASE_URL . "/developer/index.php");
+                exit;
+            }
+        } else {
+            $errorMessage = $loginResult['message'];
         }
     }
 }
